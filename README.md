@@ -68,8 +68,7 @@ var api = new Endpoints({
     url: 'BASEURL',
     dataType : 'json',
     headers: {
-      'Accept': 'application/json;version=' + env.apiVer,
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     }
   },
 
