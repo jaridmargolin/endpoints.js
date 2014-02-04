@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- meta -->
+        <meta charset="utf-8" />
+        <title>Endpoints Tests</title>
+        
+        <!-- styles -->
+        <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+    </head>
+
+    <body>
+
+        <div id="mocha"></div>
+
+        <!-- tests -->
+        <script src="../libs/requirejs/require.js"></script>
+        <script>
+            var curURL  = window.location.href.toString(),
+                curDir  = curURL.slice(0, curURL.lastIndexOf('/')),
+                rootDir = curDir.slice(0, curDir.lastIndexOf('/'));
+
+            require.config({
+              urlArgs: "bust=" + (new Date()).getTime(),
+              baseUrl: '../src',
+              paths: {
+                'proclaim' : rootDir + '/node_modules/proclaim/lib/proclaim',
+                'mocha'    : rootDir + '/node_modules/mocha/mocha',
+                'jquery'   : rootDir + '/libs/jquery/jquery',
+              }
+            });
+
+            require(['require', 'mocha'], function(require) {
+              // mocha setup
+              mocha.setup('bdd');
+              mocha.reporter('html');
+              // begin tests
+              require([
+                './config.js',
+                './endpoints.js',
+                './resource.js',
+                './utils.js'
+              ], function(require) {
+                mocha.run();
+              });
+            });
+        </script>
+    </body>
+</html>
