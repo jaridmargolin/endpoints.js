@@ -10,6 +10,43 @@ var utils = function () {
                 return function () {
                     return Object.prototype.toString.call(params) !== '[object Array]' ? method.apply(params, arguments) : method.apply(context, params.concat(Array.prototype.slice.call(arguments)));
                 };
+            },
+            namespace: {
+                loop: function (obj, key, opts) {
+                    var parts = key.split('.');
+                    for (var i = 0, len = parts.length; i < len; i++) {
+                        if (len == i + 1) {
+                            opts.last(obj, parts, i);
+                            return;
+                        }
+                        if (!obj[parts[i]]) {
+                            opts.missing(obj, parts, i);
+                        }
+                        obj = obj[parts[i]];
+                    }
+                },
+                get: function (obj, key) {
+                    var val;
+                    this.loop(obj, key, {
+                        last: function (obj, parts, i) {
+                            val = obj[parts[i]];
+                        },
+                        missing: function (obj, parts, i) {
+                            throw new Error('Object ' + parts[i] + ' does not exist');
+                        }
+                    });
+                    return val;
+                },
+                set: function (obj, key, val) {
+                    this.loop(obj, key, {
+                        last: function (obj, parts, i) {
+                            obj[parts[i]] = val;
+                        },
+                        missing: function (obj, parts, i) {
+                            obj[parts[i]] = {};
+                        }
+                    });
+                }
             }
         };
     }();
@@ -52,44 +89,19 @@ var resource = function ($, utils) {
         };
         return Resource;
     }(jquery, utils);
-var config = function () {
+var config = function (utils) {
         var Config = function () {
             this.attr = {};
         };
         Config.prototype.get = function (key) {
-            return this._getKey(key);
+            return utils.namespace.get(this.attr, key);
         };
         Config.prototype.set = function (key, val) {
-            return arguments.length == 1 ? this._attr = key : this._setKey(key, val);
-        };
-        Config.prototype._setKey = function (key, val) {
-            var parts = key.split('.');
-            for (var i = 0, len = parts.length, obj = this._attr; i < len; i++) {
-                if (len == i + 1) {
-                    obj[parts[i]] = val;
-                    return;
-                }
-                if (!obj[parts[i]]) {
-                    obj[parts[i]] = {};
-                }
-                obj = obj[parts[i]];
-            }
-        };
-        Config.prototype._getKey = function (key) {
-            var parts = key.split('.');
-            for (var i = 0, len = parts.length, obj = this._attr; i < len; i++) {
-                if (len == i + 1) {
-                    return obj[parts[i]];
-                }
-                if (!obj[parts[i]]) {
-                    throw new Error('Object ' + parts[i] + ' does not exist');
-                }
-                obj = obj[parts[i]];
-            }
+            return arguments.length == 1 ? this.attr = key : utils.namespace.set(this.attr, key, val);
         };
         return Config;
-    }();
-var endpoints = function ($, Resource, Config) {
+    }(utils);
+var endpoints = function ($, utils, Resource, Config) {
         var Endpoints = function (opts) {
             this.config = new Config();
             for (var key in opts.resources) {
@@ -101,13 +113,14 @@ var endpoints = function ($, Resource, Config) {
         Endpoints.prototype.authorize = function (data) {
             var auth = this.config.get('authorization'), creds = $.extend({}, auth);
             delete creds.endpoint;
-            auth.endpoint($.extend(creds, data));
+            var endpoint = utils.namespace.get(this, auth.endpoint);
+            endpoint($.extend(creds, data));
         };
         Endpoints.prototype.set = function (key, val) {
             this.config.set(key, val);
         };
         return Endpoints;
-    }(jquery, resource, config);
+    }(jquery, utils, resource, config);
 return endpoints;
 
 });

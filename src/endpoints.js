@@ -6,9 +6,10 @@
 
 define([
   'jquery',
+  'utils',
   'resource',
   'config'
-], function ($, Resource, Config) {
+], function ($, utils, Resource, Config) {
 
 
 // ----------------------------------------------------------------------------
@@ -42,7 +43,8 @@ Endpoints.prototype.authorize = function (data) {
   delete creds.endpoint;
 
   // Call auth endpoint
-  auth.endpoint($.extend(creds, data));
+  var endpoint = utils.namespace.get(this, auth.endpoint);
+  endpoint($.extend(creds, data));
 };
 
 //
