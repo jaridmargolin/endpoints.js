@@ -25,10 +25,7 @@ var testInitiation = function () {
 // Test Config get method
 //
 var testGet = function () {
-  it('Should return specified property', function () {
-
-  });
-  it('Should return undefined if property does not exist', function () {
+  it('Should return specified namespace prop', function () {
 
   });
 };
@@ -40,7 +37,7 @@ var testSet = function () {
   it('Should set value for specified property', function () {
 
   });
-  it('Should create empty namespace objects if necessary', function () {
+  it('Should set value for specified namespace property', function () {
 
   });
 };

@@ -60,7 +60,7 @@ var api = new Endpoints({
   authorization: {
     username: 'USERNAME',
     password: 'PASSWORD',
-    endpoint: user.login
+    endpoint: 'user.login'
   },
 
   // Default opts for all calls
