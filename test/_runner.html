@@ -24,9 +24,9 @@
               urlArgs: "bust=" + (new Date()).getTime(),
               baseUrl: '../src',
               paths: {
-                'proclaim' : rootDir + '/node_modules/proclaim/lib/proclaim',
-                'mocha'    : rootDir + '/node_modules/mocha/mocha',
-                'jquery'   : rootDir + '/libs/jquery/jquery',
+                'proclaim'   : rootDir + '/node_modules/proclaim/lib/proclaim',
+                'mocha'      : rootDir + '/node_modules/mocha/mocha',
+                'underscore' : rootDir + '/libs/underscore/underscore',
               }
             });
 
@@ -36,7 +36,6 @@
               mocha.reporter('html');
               // begin tests
               require([
-                './config.js',
                 './endpoints.js',
                 './resource.js',
                 './utils.js'

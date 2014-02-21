@@ -5,21 +5,21 @@
  */
 
 define([
-  'jquery',
+  'underscore',
   'utils'
-], function ($, utils) {
+], function (_, _u_) {
 
 
 // ----------------------------------------------------------------------------
 // Resource class
 // ----------------------------------------------------------------------------
-var Resource = function (endpoints, config) {
+var Resource = function (endpoints, defaults, ajax) {
   for (var key in endpoints) {
     this[key] = this._create(endpoints[key]);
   }
 
-  // Set resource config instance
-  this.config = config;
+  this.defaults = defaults;
+  this.ajax = ajax
 };
 
 //
@@ -32,15 +32,15 @@ var Resource = function (endpoints, config) {
 Resource.prototype._create = function (endpoint) {
   // Return function that calls endpoint
   return utils.handler(function (opts, getOpts) {
-    // New base based off config
-    var base = $.extend({}, this.config.get('defaults'));
+    // New base from defaults
+    var base = _.extend({}, this.defaults);
 
     // Set endpoint base props
     base.url += endpoint.path;
     base.type = endpoint.type;
 
     // Extend base with opts
-    opts = $.extend(base, opts);
+    opts = _.extend(base, opts);
 
     // Alter opts before request call
     if (endpoint.before) {
@@ -51,7 +51,7 @@ Resource.prototype._create = function (endpoint) {
     this['_' + endpoint.type](opts);
 
     // Make call or return opts object
-    return getOpts ? opts : $.ajax(opts);
+    return getOpts ? opts : this.ajax(opts);
   }, this);
 };
 
@@ -63,7 +63,7 @@ Resource.prototype._create = function (endpoint) {
 //
 Resource.prototype._GET = function (opts) {
   if (opts.data) {
-    opts.url += '?' + $.param(opts.data);
+    opts.url += '?' + _u_.param(opts.data);
     delete opts.data;
   }
 };
@@ -88,7 +88,7 @@ Resource.prototype._POST = function (opts) {
 //
 Resource.prototype._DELETE = function (opts) {
   if (opts.data) {
-    opts.url += '?' + $.param(opts.data);
+    opts.url += '?' + _u_.param(opts.data);
     delete opts.data;
   }
 };

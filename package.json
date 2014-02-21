@@ -1,6 +1,6 @@
 {
   "name": "endpoints.js",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Module for creating browser based api clients.",
   "author": "Jarid Margolin <jarid@firstopinion.co>",
   "repository": {

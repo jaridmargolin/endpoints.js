@@ -68,14 +68,14 @@ module.exports = function (grunt) {
             return require('amdclean').clean(contents);
           },
           paths: {
-            'jquery': '../libs/jquery/jquery'
+            'underscore': '../libs/underscore/underscore'
           },
           wrap: {
             startFile: ['src/tmpls/intro.js'],
             endFile: ['src/tmpls/outro.js']
           },
           exclude: [
-            'jquery'
+            'underscore'
           ]
         }
       }

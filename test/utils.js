@@ -25,34 +25,19 @@ var testHandler = function () {
 };
 
 //
-// Test utils namespace get
+// Test utils handler method
 //
-var testNamespaceGet = function () {
-  it('Should return specified property', function () {
-
-  });
-  it('Should return undefined if property does not exist', function () {
-
+var testParam = function () {
+  it('Should convert object to url safe param str', function () {
+    
   });
 };
 
-//
-// Test utils namespace set
-//
-var testNamespaceSet = function () {
-  it('Should set value for specified property', function () {
-
-  });
-  it('Should create empty namespace objects if necessary', function () {
-
-  });
-};
 
 // Test please
 describe('utils', function () {
   describe('handler', testHandler);
-  describe('namespace.get', testNamespaceGet);
-  describe('namespace.set', testNamespaceSet);
+  describe('param', testParam);
 });
 
 
