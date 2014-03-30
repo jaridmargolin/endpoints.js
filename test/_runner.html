@@ -1,48 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <!-- meta -->
-        <meta charset="utf-8" />
-        <title>Endpoints Tests</title>
-        
-        <!-- styles -->
-        <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
-    </head>
+  <head>
+    <!-- meta -->
+    <meta charset="utf-8" />
+    <title>endpoints.js</title>
 
-    <body>
+    <!-- styles -->
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+  </head>
 
-        <div id="mocha"></div>
+  <body>
+    <!-- content -->
+    <div id="workboard"></div>
+    <div id="mocha"></div>
 
-        <!-- tests -->
-        <script src="../libs/requirejs/require.js"></script>
-        <script>
-            var curURL  = window.location.href.toString(),
-                curDir  = curURL.slice(0, curURL.lastIndexOf('/')),
-                rootDir = curDir.slice(0, curDir.lastIndexOf('/'));
-
-            require.config({
-              urlArgs: "bust=" + (new Date()).getTime(),
-              baseUrl: '../src',
-              paths: {
-                'proclaim'   : rootDir + '/node_modules/proclaim/lib/proclaim',
-                'mocha'      : rootDir + '/node_modules/mocha/mocha',
-                'underscore' : rootDir + '/libs/underscore/underscore',
-              }
-            });
-
-            require(['require', 'mocha'], function(require) {
-              // mocha setup
-              mocha.setup('bdd');
-              mocha.reporter('html');
-              // begin tests
-              require([
-                './endpoints.js',
-                './resource.js',
-                './utils.js'
-              ], function(require) {
-                mocha.run();
-              });
-            });
-        </script>
-    </body>
+    <!-- tests -->
+    <script src="../bower_components/requirejs/require.js"></script>
+    <script src="../bower_components/easy-amdtest/dist/easy-amdtest.js"></script>
+    <script>
+      var testSuite = new EasyAMDTest({
+        baseUrl: '../src',
+        urlArgs: 'bust=' + (new Date()).getTime(),
+        paths: {
+          'proclaim'   : '/node_modules/proclaim/lib/proclaim',
+          'mocha'      : '/node_modules/mocha/mocha',
+          'underscore' : '/bower_components/underscore/underscore'
+        }
+      }).run({
+        name: 'mocha',
+        tests: [
+          './endpoints.js',
+          './resource.js',
+          './utils.js'
+        ]
+      });
+    </script>
+  </body>
 </html>
