@@ -4,7 +4,7 @@
  * (C) 2014 First Opinion
  * MIT LICENCE
  *
- */ 
+ */
 
 define([
   'proclaim',

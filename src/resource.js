@@ -19,7 +19,7 @@ var Resource = function (endpoints, defaults, ajax) {
   }
 
   this.defaults = defaults;
-  this.ajax = ajax
+  this.ajax = ajax;
 };
 
 //
