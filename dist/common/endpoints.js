@@ -1,6 +1,4 @@
-;(function (underscore) {
-
-
+require('underscore')
 /*!
  * utils.js
  * 
@@ -134,10 +132,4 @@ var endpoints = function (Resource) {
   }(resource);
 
 
-
-this['Endpoints'] = endpoints;
-
-
-
-
-}(root.underscore));
+module.exports = endpoints;

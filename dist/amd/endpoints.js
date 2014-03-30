@@ -1,4 +1,4 @@
-;(function (underscore) {
+define(['underscore'], function (underscore) {
 
 
 /*!
@@ -134,10 +134,8 @@ var endpoints = function (Resource) {
   }(resource);
 
 
-
-this['Endpoints'] = endpoints;
-
+return endpoints;
 
 
 
-}(root.underscore));
+});

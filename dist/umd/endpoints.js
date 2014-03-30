@@ -1,4 +1,18 @@
-;(function (underscore) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['underscore'], function () {
+      return (root.returnExportsGlobal = factory('underscore'));
+    });
+  } else if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like enviroments that support module.exports,
+    // like Node.
+    module.exports = factory(require('underscore'));
+  } else {
+    root['Endpoints'] = factory(root.underscore);
+  }
+}(this, function (underscore) {
 
 
 /*!
@@ -134,10 +148,8 @@ var endpoints = function (Resource) {
   }(resource);
 
 
-
-this['Endpoints'] = endpoints;
-
+return endpoints;
 
 
 
-}(root.underscore));
+}));
