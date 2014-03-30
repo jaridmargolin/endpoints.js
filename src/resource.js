@@ -11,15 +11,22 @@ define([
 
 
 // ----------------------------------------------------------------------------
-// Resource class
+// Resource
+//
+// Creates indiviudal endpoints and responsible for correctly formatting
+// specific request types (GET, POST, DELETE, etc..)
 // ----------------------------------------------------------------------------
-var Resource = function (endpoints, defaults, ajax) {
+
+var Resource = function (ajax, defaults, decorators, endpoints) {
+  // Need to set passed opts as instance vars.
+  this.decorators = decorators;
+  this.defaults = defaults;
+  this.ajax = ajax;
+
+  // Initiate resource
   for (var key in endpoints) {
     this[key] = this._create(endpoints[key]);
   }
-
-  this.defaults = defaults;
-  this.ajax = ajax;
 };
 
 //
@@ -31,7 +38,7 @@ var Resource = function (endpoints, defaults, ajax) {
 //
 Resource.prototype._create = function (endpoint) {
   // Return function that calls endpoint
-  return utils.handler(function (opts, getOpts) {
+  return _.bind(function (opts, getOpts) {
     // New base from defaults
     var base = _.extend({}, this.defaults);
 
@@ -45,6 +52,11 @@ Resource.prototype._create = function (endpoint) {
     // Alter opts before request call
     if (endpoint.before) {
       endpoint.before(opts);
+    }
+
+    // Add decorators
+    for (var prop in this.decorators) {
+      _u_.decorate(opts, prop, this.decorators[prop]);
     }
 
     // Request call
@@ -96,6 +108,7 @@ Resource.prototype._DELETE = function (opts) {
 // ----------------------------------------------------------------------------
 // Expose
 // ----------------------------------------------------------------------------
+
 return Resource;
 
 
