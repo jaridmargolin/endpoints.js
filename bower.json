@@ -1,6 +1,6 @@
 {
   "name": "endpoints",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "devDependencies": {
     "requirejs": "2.1.9",
     "underscore": "1.6.0",
