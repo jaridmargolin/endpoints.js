@@ -12,6 +12,6 @@
     "commit": "8d2689bc45119a2f6e6b73159dc52862fc66cb97"
   },
   "_source": "git://github.com/easy-js/easy-amdtest.git",
-  "_target": "0.0.1",
+  "_target": "~0.0.1",
   "_originalSource": "easy-amdtest"
 }

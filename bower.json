@@ -1,9 +1,8 @@
 {
   "name": "endpoints",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "devDependencies": {
-    "requirejs": "2.1.9",
-    "underscore": "1.6.0",
-    "easy-amdtest": "0.0.1"
+    "requirejs": "~2.1.11",
+    "easy-amdtest": "~0.0.1"
   }
 }

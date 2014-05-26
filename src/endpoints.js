@@ -5,26 +5,10 @@
  */
 
 define([
-  'utils',
+  'lodash/functions/bind',
+  'configuration',
   'resource',
-], function (_u_, Resource) {
-
-
-// ----------------------------------------------------------------------------
-// Endpoints defaults
-// ----------------------------------------------------------------------------
-
-// Basic
-var defaults = {
-  dataType : 'json',
-  timeout  : 5000,
-  headers  : {}
-};
-
-// Headers
-defaults.headers = {
-  'Content-Type': 'application/json'
-};
+], function (bind, Configuration, Resource) {
 
 
 // ----------------------------------------------------------------------------
@@ -36,33 +20,38 @@ defaults.headers = {
 // - Provides defaults for api.
 // ----------------------------------------------------------------------------
 
-var Endpoints = function (ajax, opts) {
-  var decorators = opts.decorators || {},
-      resources  = opts.resources;
+var Endpoints = function (ajax, options) {
+  var decorators = options.decorators || {},
+      resources  = options.resources;
 
   // Remove all properties that are not defaults
-  // *opts is now equal to defaults.
-  delete opts.decorators;
-  delete opts.resources;
+  // *options is now equal to defaults.
+  delete options.decorators;
+  delete options.resources;
 
   // Mixin module defaults with user specified defaults
-  // in order to create resourceDefaults.
-  this.resourceDefaults = _u_.deepExtend({}, defaults, opts);
+  // and pass to new configuration to manage.
+  var configuration  = new Endpoints.Configuration(options);
+
+  // Add alias / attach to instance.
+  this.configure = bind(configuration.set, configuration);
+  this.reset = bind(configuration.reset, configuration);
 
   // Loop over resources and create endpoints. Resources are mixed into
   // the Endpoints instance for easy access.
   for (var key in resources) {
-    this[key] = new Resource(ajax, this.resourceDefaults, decorators, resources[key]);
+    this[key] = new Endpoints.Resource(ajax, configuration, decorators, resources[key], this);
   }
 };
 
 //
-// Configure is a proxy to set properties on default. Behind
-// the scenes it uses a deepMerge.
+// I want to add Configuration and Resource to the Endpoints.
+// Primarily used for mocking, but this also makes the two
+// components accesible if a resource needs to be created outside
+// of endpoints.
 //
-Endpoints.prototype.configure = function (data) {
-  _u_.deepMerge(this.resourceDefaults, data);
-};
+Endpoints.Configuration = Configuration;
+Endpoints.Resource = Configuration;
 
 
 // ----------------------------------------------------------------------------

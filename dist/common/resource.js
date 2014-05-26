@@ -4,12 +4,10 @@
  * Copyright (c) 2014
  */
 
-define([
-  'lodash/functions/bind',
-  'lodash/objects/assign',
-  'utils/decorate',
-  'utils/param'
-], function (bind, assign, decorate, param) {
+var bind = require('lodash/functions/bind');
+var assign = require('lodash/objects/assign');
+var decorate = require('utils/decorate');
+var param = require('utils/param');
 
 
 // ----------------------------------------------------------------------------
@@ -115,7 +113,6 @@ Resource.prototype._DELETE = function (opts) {
 // Expose
 // ----------------------------------------------------------------------------
 
-return Resource;
+module.exports = Resource;
 
 
-});
