@@ -12,7 +12,7 @@
     "url": "https://github.com/firstopinion/endpoints.js/issues"
   },
   "scripts": {
-    "test": "grunt test-local"
+    "test": "grunt test"
   },
   "dependencies": {
     "lodash-amd": "~2.4.1"
