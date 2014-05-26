@@ -11,7 +11,6 @@
 
   <body>
     <!-- content -->
-    <div id="workboard"></div>
     <div id="mocha"></div>
 
     <!-- tests -->
@@ -22,16 +21,24 @@
         baseUrl: '../src',
         urlArgs: 'bust=' + (new Date()).getTime(),
         paths: {
-          'proclaim'   : '/node_modules/proclaim/lib/proclaim',
-          'mocha'      : '/node_modules/mocha/mocha',
-          'underscore' : '/bower_components/underscore/underscore'
+          'proclaim' : '/node_modules/proclaim/lib/proclaim',
+          'sinon'    : '/node_modules/sinon/pkg/sinon',
+          'mocha'    : '/node_modules/mocha/mocha',
+          'lodash'   : '/node_modules/lodash-amd/compat'
+        },
+        shim: {
+          'sinon': {
+            exports: 'sinon'
+          }
         }
       }).run({
         name: 'mocha',
         tests: [
           './endpoints.js',
+          './configuration.js',
           './resource.js',
-          './utils.js'
+          './utils/decorate.js',
+          './utils/param.js'
         ]
       });
     </script>

@@ -31,11 +31,13 @@ grunt.initConfig({
   // --------------------------------------------------------------------------
   // PKG CONFIG
   // --------------------------------------------------------------------------
+  
   'pkg': grunt.file.readJSON('package.json'),
 
   // --------------------------------------------------------------------------
   // JSHINT
   // --------------------------------------------------------------------------
+  
   'jshint': {
     src: [
       'Gruntfile.js',
@@ -52,14 +54,18 @@ grunt.initConfig({
     }
   },
 
+
   // --------------------------------------------------------------------------
   // CLEAN (EMPTY DIRECTORY)
   // --------------------------------------------------------------------------
+  
   'clean': ['dist'],
+
 
   // --------------------------------------------------------------------------
   // REQUIREJS BUILD
   // --------------------------------------------------------------------------
+  
   'requirejs': {
     compile: {
       options: {
@@ -69,11 +75,8 @@ grunt.initConfig({
         optimize: 'none',
         skipModuleInsertion: true,
         paths: {
-          'underscore': '../bower_components/underscore/underscore'
+          'lodash': '../node_modules/lodash-amd/compat'
         },
-        exclude: [
-          'underscore'
-        ],
         onBuildWrite: function(name, path, contents) {
           return require('amdclean').clean({
             code: contents,
@@ -89,45 +92,17 @@ grunt.initConfig({
     }
   },
 
+
   // --------------------------------------------------------------------------
   // UMD WRAP
   // --------------------------------------------------------------------------
+  
   'umd': {
-    umd: {
+    all: {
       src: 'dist/endpoints.js',
       objectToExport: 'endpoints',
       globalAlias: 'Endpoints',
       template: 'src/tmpls/umd.hbs',
-      dest: 'dist/umd/endpoints.js',
-      deps: {
-        'default': ['underscore']
-      }
-    },
-    amd: {
-      src: 'dist/endpoints.js',
-      objectToExport: 'endpoints',
-      globalAlias: 'Endpoints',
-      template: 'src/tmpls/amd.hbs',
-      dest: 'dist/amd/endpoints.js',
-      deps: {
-        'default': ['underscore']
-      }
-    },
-    common: {
-      src: 'dist/endpoints.js',
-      objectToExport: 'endpoints',
-      globalAlias: 'Endpoints',
-      template: 'src/tmpls/common.hbs',
-      dest: 'dist/common/endpoints.js',
-      deps: {
-        'default': ['underscore']
-      }
-    },
-    standalone: {
-      src: 'dist/endpoints.js',
-      objectToExport: 'endpoints',
-      globalAlias: 'Endpoints',
-      template: 'src/tmpls/standalone.hbs',
       dest: 'dist/endpoints.js',
       deps: {
         'default': ['underscore']
@@ -135,9 +110,11 @@ grunt.initConfig({
     }
   },
 
+
   // --------------------------------------------------------------------------
   // MINIFY JS
   // --------------------------------------------------------------------------
+  
   'uglify': {
     all: {
       expand: true,
@@ -148,18 +125,68 @@ grunt.initConfig({
     }
   },
 
+
+  // --------------------------------------------------------------------------
+  // CREATE COMMONJS VERSION IN DIST
+  // --------------------------------------------------------------------------
+
+  'nodefy': {
+    all: {
+      expand: true,
+      src: ['**/*.js'],
+      cwd: 'src/',
+      dest: 'dist/common'
+    }
+  },
+
+
+  // --------------------------------------------------------------------------
+  // COPY AMD TO DIST
+  // --------------------------------------------------------------------------
+
+  'copy': {
+    all: {
+      expand: true,
+      src: ['**/*.js'],
+      cwd: 'src/',
+      dest: 'dist/amd'
+    }
+  },
+
+
+  // --------------------------------------------------------------------------
+  // WATCH FILES
+  // --------------------------------------------------------------------------
+
+  'watch': {
+    options: { spawn: true },
+    src: {
+      files: ['Gruntfile.js', 'src/**/*.js'],
+      tasks: ['build'],
+      options: { livereload: true }
+    },
+    test: {
+      files: ['test/**/*'],
+      options: { livereload: true }
+    }
+  },
+
+
   // --------------------------------------------------------------------------
   // STATIC SERVER
   // --------------------------------------------------------------------------
+  
   'connect': {
     server: {
       options: { base: '', port: 9999 }
     }
   },
 
+
   // --------------------------------------------------------------------------
   // TESTS
   // --------------------------------------------------------------------------
+  
   'saucelabs-mocha': {
     all: {
       options: {
@@ -173,6 +200,7 @@ grunt.initConfig({
     }
   },
 
+
   // --------------------------------------------------------------------------
   // MOCHA
   // --------------------------------------------------------------------------
@@ -182,10 +210,13 @@ grunt.initConfig({
 
 });
 
+
 // Tasks    
-grunt.registerTask('default', ['jshint:src', 'clean', 'requirejs', 'umd:umd', 'umd:amd', 'umd:common', 'umd:standalone', 'uglify', 'jshint:build']);
-grunt.registerTask('test-local', ['default', 'mocha_phantomjs']);
-grunt.registerTask('test', ['default', 'connect', 'saucelabs-mocha']);
+grunt.registerTask('default', ['build']);
+grunt.registerTask('dev', ['build', 'connect', 'watch']);
+grunt.registerTask('test', ['build', 'mocha_phantomjs']);
+grunt.registerTask('test-cloud', ['build', 'connect', 'saucelabs-mocha']);
+grunt.registerTask('build', ['jshint:src', 'clean', 'requirejs', 'umd', 'uglify', 'nodefy', 'copy']);
 
 
 };
