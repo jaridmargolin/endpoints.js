@@ -18,28 +18,17 @@
     <script src="../node_modules/easy-amdtest/dist/easy-amdtest.js"></script>
     <script>
       var testSuite = new EasyAMDTest({
-        baseUrl: '../src',
+        baseUrl: '../dist',
         urlArgs: 'bust=' + (new Date()).getTime(),
         paths: {
           'proclaim'  : '/node_modules/proclaim/lib/proclaim',
-          'sinon'     : '/node_modules/sinon/pkg/sinon',
           'mocha'     : '/node_modules/mocha/mocha',
-          'lodash'    : '/node_modules/lodash-amd/compat',
-          'endpoints' : '/src'
-        },
-        shim: {
-          'sinon': {
-            exports: 'sinon'
-          }
+          'endpoints' : '/dist'
         }
       }).run({
         name: 'mocha',
         tests: [
-          './endpoints.js',
-          './configuration.js',
-          './resource.js',
-          './utils/decorate.js',
-          './utils/param.js'
+          './_dist-umd.js'
         ]
       });
     </script>

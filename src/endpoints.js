@@ -6,8 +6,8 @@
 
 define([
   'lodash/functions/bind',
-  'configuration',
-  'resource',
+  'endpoints/configuration',
+  'endpoints/resource',
 ], function (bind, Configuration, Resource) {
 
 

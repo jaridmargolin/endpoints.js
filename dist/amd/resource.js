@@ -7,8 +7,8 @@
 define([
   'lodash/functions/bind',
   'lodash/objects/assign',
-  'utils/decorate',
-  'utils/param'
+  'endpoints/utils/decorate',
+  'endpoints/utils/param'
 ], function (bind, assign, decorate, param) {
 
 

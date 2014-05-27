@@ -5,8 +5,8 @@
  */
 
 var bind = require('lodash/functions/bind');
-var Configuration = require('configuration');
-var Resource = require('resource');
+var Configuration = require('endpoints/configuration');
+var Resource = require('endpoints/resource');
 
 
 // ----------------------------------------------------------------------------

@@ -6,8 +6,8 @@
 
 var bind = require('lodash/functions/bind');
 var assign = require('lodash/objects/assign');
-var decorate = require('utils/decorate');
-var param = require('utils/param');
+var decorate = require('endpoints/utils/decorate');
+var param = require('endpoints/utils/param');
 
 
 // ----------------------------------------------------------------------------

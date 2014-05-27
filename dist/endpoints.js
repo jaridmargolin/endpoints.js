@@ -1,18 +1,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['underscore'], function (underscore) {
-      return (root.returnExportsGlobal = factory(underscore));
+    define([], function () {
+      return (root.returnExportsGlobal = factory());
     });
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like enviroments that support module.exports,
     // like Node.
-    module.exports = factory(require('underscore'));
+    module.exports = factory();
   } else {
-    root['Endpoints'] = factory(root.underscore);
+    root['Endpoints'] = factory();
   }
-}(this, function (underscore) {
+}(this, function () {
 
 
 /**
@@ -1758,8 +1758,8 @@ lodashObjectsMerge = function (baseCreateCallback, baseMerge, getArray, isObject
  * 
  * Copyright (c) 2014
  */
-var configuration;
-configuration = function (merge) {
+var endpointsConfiguration;
+endpointsConfiguration = function (merge) {
   // ----------------------------------------------------------------------------
   // Defaults
   // ----------------------------------------------------------------------------
@@ -1900,8 +1900,8 @@ lodashFunctionsWrap = function (createWrapper) {
  * 
  * Copyright (c) 2014
  */
-var utilsDecorate;
-utilsDecorate = function (wrap) {
+var endpointsUtilsDecorate;
+endpointsUtilsDecorate = function (wrap) {
   // ----------------------------------------------------------------------------
   // decorate
   //
@@ -1929,8 +1929,8 @@ utilsDecorate = function (wrap) {
  * 
  * Copyright (c) 2014
  */
-var utilsParam;
-utilsParam = function () {
+var endpointsUtilsParam;
+endpointsUtilsParam = function () {
   // ----------------------------------------------------------------------------
   // param
   //
@@ -1956,8 +1956,8 @@ utilsParam = function () {
  * 
  * Copyright (c) 2014
  */
-var resource;
-resource = function (bind, assign, decorate, param) {
+var endpointsResource;
+endpointsResource = function (bind, assign, decorate, param) {
   // ----------------------------------------------------------------------------
   // Resource
   //
@@ -2048,14 +2048,14 @@ resource = function (bind, assign, decorate, param) {
   // Expose
   // ----------------------------------------------------------------------------
   return Resource;
-}(lodashFunctionsBind, lodashObjectsAssign, utilsDecorate, utilsParam);
+}(lodashFunctionsBind, lodashObjectsAssign, endpointsUtilsDecorate, endpointsUtilsParam);
 /*!
  * endpoints.js
  * 
  * Copyright (c) 2014
  */
-var endpoints;
-endpoints = function (bind, Configuration, Resource) {
+var endpointsEndpoints;
+endpointsEndpoints = function (bind, Configuration, Resource) {
   // ----------------------------------------------------------------------------
   // Endpoints module
   //
@@ -2094,10 +2094,22 @@ endpoints = function (bind, Configuration, Resource) {
   // Expose
   // ----------------------------------------------------------------------------
   return Endpoints;
-}(lodashFunctionsBind, configuration, resource);
+}(lodashFunctionsBind, endpointsConfiguration, endpointsResource);
+/*!
+ * index.js
+ * 
+ * Copyright (c) 2014
+ */
+var index;
+index = function (Endpoints) {
+  // ----------------------------------------------------------------------------
+  // Expose
+  // ----------------------------------------------------------------------------
+  return Endpoints;
+}(endpointsEndpoints);
 
 
-return endpoints;
+return index;
 
 
 
