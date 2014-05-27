@@ -55,7 +55,7 @@ describe('endpoints.js', function () {
     afterEach(function () {
       Endpoints.Resource.restore();
       Endpoints.Configuration.restore();
-    })
+    });
 
     it('Should call Configuration constructor passing all options excluding decorators and resources.', function () {
       var endpoints = new Endpoints(ajax, {
