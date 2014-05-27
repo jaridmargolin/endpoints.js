@@ -1,4 +1,4 @@
-endpoints.js [![Build Status](https://travis-ci.org/firstopinion/endpoints.js.png)](https://travis-ci.org/firstopinion/endpoints.js)
+endpoints.js [![Build Status](https://travis-ci.org/firstopinion/endpoints.js.svg)](https://travis-ci.org/firstopinion/endpoints.js) [![Dependency Status](https://david-dm.org/firstopinion/endpoints.js.svg)](https://david-dm.org/firstopinion/endpoints.js) [![devDependency Status](https://david-dm.org/firstopinion/endpoints.js/dev-status.svg)](https://david-dm.org/firstopinion/endpoints.js#info=devDependencies)
 ============
 
 Module for creating browser based api clients.
