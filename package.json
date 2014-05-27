@@ -15,7 +15,7 @@
     "test": "grunt test"
   },
   "main": "./dist/common",
-  "dependencies": {
+  "peerDependencies": {
     "lodash-amd": "~2.4.1"
   },
   "devDependencies": {
