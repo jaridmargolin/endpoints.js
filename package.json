@@ -18,23 +18,25 @@
     "lodash-amd": "~2.4.1"
   },
   "devDependencies": {
-    "amdclean": "~1.5.0",
+    "amdclean": "~2.0.0",
+    "easy-amdtest": "~0.0.1",
     "grunt": "~0.4.3",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-connect": "~0.7.1",
+    "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-nodefy": "~0.2.1",
     "grunt-contrib-requirejs": "~0.4.1",
     "grunt-contrib-uglify": "~0.4.0",
-    "grunt-contrib-nodefy": "~0.2.1",
-    "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1",
-    "grunt-mocha-phantomjs": "~0.4.0",
-    "grunt-saucelabs": "~5.1.0",
+    "grunt-mocha-phantomjs": "~0.5.0",
+    "grunt-saucelabs": "~7.0.0",
     "grunt-umd": "~1.7.3",
     "matchdep": "~0.3.0",
-    "mocha": "~1.18.2",
+    "mocha": "~1.19.0",
     "proclaim": "~2.0.0",
-    "sinon": "~1.9.0"
+    "requirejs": "~2.1.11",
+    "sinon": "~1.10.0"
   },
   "license": "MIT"
 }
