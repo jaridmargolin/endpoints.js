@@ -9,7 +9,7 @@
 define([
   'proclaim',
   'sinon',
-  'utils/decorate'
+  'endpoints/utils/decorate'
 ], function (assert, sinon, decorate) {
 
 

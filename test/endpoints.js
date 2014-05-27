@@ -9,9 +9,9 @@
 define([
   'proclaim',
   'sinon',
-  'configuration',
-  'resource',
-  'endpoints'
+  'endpoints/configuration',
+  'endpoints/resource',
+  'endpoints/endpoints'
 ], function (assert, sinon, Configuration, Resource, Endpoints) {
 
 

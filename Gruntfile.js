@@ -69,13 +69,14 @@ grunt.initConfig({
   'requirejs': {
     compile: {
       options: {
-        name: 'endpoints',
+        name: 'index',
         baseUrl: 'src',
         out: 'dist/endpoints.js',
         optimize: 'none',
         skipModuleInsertion: true,
         paths: {
-          'lodash': '../node_modules/lodash-amd/compat'
+          'lodash'    : '../node_modules/lodash-amd/compat',
+          'endpoints' : '../src'
         },
         onBuildWrite: function(name, path, contents) {
           return require('amdclean').clean({
@@ -100,13 +101,10 @@ grunt.initConfig({
   'umd': {
     all: {
       src: 'dist/endpoints.js',
-      objectToExport: 'endpoints',
+      objectToExport: 'index',
       globalAlias: 'Endpoints',
       template: 'src/tmpls/umd.hbs',
-      dest: 'dist/endpoints.js',
-      deps: {
-        'default': ['underscore']
-      }
+      dest: 'dist/endpoints.js'
     }
   },
 
@@ -190,7 +188,11 @@ grunt.initConfig({
   'saucelabs-mocha': {
     all: {
       options: {
-        urls: ['http://127.0.0.1:9999/test/_runner.html'],
+        urls: [
+          'http://127.0.0.1:9999/test/_runner.html',
+          'http://127.0.0.1:9999/test/_dist-amd.html',
+          'http://127.0.0.1:9999/test/_dist-umd.html'
+        ],
         build: process.env.TRAVIS_JOB_ID || '<%= pkg.version %>',
         tunnelTimeout: 5,
         concurrency: 3,
@@ -205,7 +207,11 @@ grunt.initConfig({
   // MOCHA
   // --------------------------------------------------------------------------
   'mocha_phantomjs': {
-    all: ['test/_runner.html']
+    all: [
+      'test/_runner.html',
+      'test/_dist-amd.html',
+      'test/_dist-umd.html'
+    ]
   }
 
 });

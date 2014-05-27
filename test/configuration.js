@@ -10,7 +10,7 @@ define([
   'proclaim',
   'sinon',
   'lodash/objects/merge',
-  'configuration',
+  'endpoints/configuration',
 ], function (assert, sinon, merge, Configuration) {
 
 

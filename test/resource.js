@@ -9,7 +9,7 @@
 define([
   'proclaim',
   'sinon',
-  'resource'
+  'endpoints/resource'
 ], function (assert, sinon, Resource) {
 
 
