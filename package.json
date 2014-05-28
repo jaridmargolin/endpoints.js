@@ -37,7 +37,8 @@
     "mocha": "~1.19.0",
     "proclaim": "~2.0.0",
     "requirejs": "~2.1.11",
-    "sinon": "~1.10.0"
+    "sinon": "~1.10.0",
+    "lodash-amd": "~2.4.1"
   },
   "license": "MIT"
 }
