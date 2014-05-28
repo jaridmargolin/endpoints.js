@@ -2089,7 +2089,7 @@ endpointsEndpoints = function (bind, Configuration, Resource) {
   // of endpoints.
   //
   Endpoints.Configuration = Configuration;
-  Endpoints.Resource = Configuration;
+  Endpoints.Resource = Resource;
   // ----------------------------------------------------------------------------
   // Expose
   // ----------------------------------------------------------------------------
