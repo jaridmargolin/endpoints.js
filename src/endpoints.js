@@ -51,7 +51,7 @@ var Endpoints = function (ajax, options) {
 // of endpoints.
 //
 Endpoints.Configuration = Configuration;
-Endpoints.Resource = Configuration;
+Endpoints.Resource = Resource;
 
 
 // ----------------------------------------------------------------------------
