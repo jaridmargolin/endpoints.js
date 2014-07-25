@@ -6,10 +6,11 @@
 
 define([
   'lodash/functions/bind',
-  'lodash/objects/assign',
+  'lodash/objects/cloneDeep',
+  'lodash/objects/merge',
   'endpoints/utils/decorate',
   'endpoints/utils/param'
-], function (bind, assign, decorate, param) {
+], function (bind, cloneDeep, merge, decorate, param) {
 
 
 // ----------------------------------------------------------------------------
@@ -42,15 +43,17 @@ var Resource = function (ajax, configuration, decorators, resource, context) {
 Resource.prototype._create = function (endpoint) {
   // Return function that calls endpoint
   return bind(function (opts, returns) {
-    // Call data obj copies current configuration
-    var options = assign({}, this.configuration.options);
+    // Create a new clone of our original config
+    // and merge our endpoint in.
+    var options = cloneDeep(this.configuration.options);
+    merge(options, endpoint);
 
-    // Set endpoint base props
+    // Our base url + our endpoint path = final url
     options.url += endpoint.path;
-    options.type = endpoint.type;
+    delete options.path;
 
     // Add user opts to call options
-    assign(options, opts);
+    merge(options, opts);
 
     // Alter opts before request call. Before is called
     // with the context of the endpoints instance, so that
