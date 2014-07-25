@@ -49,7 +49,10 @@ describe('resource.js', function () {
     resourceEndpoints = {
       'get': {
         type: 'GET',
-        path: '/get'
+        path: '/get',
+        headers: {
+          test: 'work'
+        }
       },
       'post': {
         type: 'POST',
@@ -128,7 +131,10 @@ describe('resource.js', function () {
       assert.deepEqual(options, {
         type: 'GET',
         url: 'http://firstopinionapp.com/get',
-        key: 'val'
+        key: 'val',
+        headers: {
+          test: 'work'
+        }
       });
     });
 
@@ -147,7 +153,10 @@ describe('resource.js', function () {
         type: 'GET',
         url: 'http://firstopinionapp.com/get',
         key: 'new val',
-        param: 'string'
+        param: 'string',
+        headers: {
+          test: 'work'
+        }
       });
     });
 

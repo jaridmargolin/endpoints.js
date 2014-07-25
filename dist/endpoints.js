@@ -1867,6 +1867,183 @@ lodashObjectsAssign = function (createIterator, defaultsIteratorOptions) {
  * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  * Available under MIT license <http://lodash.com/license>
  */
+var lodashInternalsBaseClone;
+lodashInternalsBaseClone = function (assign, baseEach, forOwn, getArray, isArray, isNode, isObject, releaseArray, slice, support) {
+  /** Used to match regexp flags from their coerced string values */
+  var reFlags = /\w*$/;
+  /** `Object#toString` result shortcuts */
+  var argsClass = '[object Arguments]', arrayClass = '[object Array]', boolClass = '[object Boolean]', dateClass = '[object Date]', funcClass = '[object Function]', numberClass = '[object Number]', objectClass = '[object Object]', regexpClass = '[object RegExp]', stringClass = '[object String]';
+  /** Used to identify object classifications that `_.clone` supports */
+  var cloneableClasses = {};
+  cloneableClasses[funcClass] = false;
+  cloneableClasses[argsClass] = cloneableClasses[arrayClass] = cloneableClasses[boolClass] = cloneableClasses[dateClass] = cloneableClasses[numberClass] = cloneableClasses[objectClass] = cloneableClasses[regexpClass] = cloneableClasses[stringClass] = true;
+  /** Used for native method references */
+  var objectProto = Object.prototype;
+  /** Used to resolve the internal [[Class]] of values */
+  var toString = objectProto.toString;
+  /** Native method shortcuts */
+  var hasOwnProperty = objectProto.hasOwnProperty;
+  /** Used to lookup a built-in constructor by [[Class]] */
+  var ctorByClass = {};
+  ctorByClass[arrayClass] = Array;
+  ctorByClass[boolClass] = Boolean;
+  ctorByClass[dateClass] = Date;
+  ctorByClass[funcClass] = Function;
+  ctorByClass[objectClass] = Object;
+  ctorByClass[numberClass] = Number;
+  ctorByClass[regexpClass] = RegExp;
+  ctorByClass[stringClass] = String;
+  /**
+   * The base implementation of `_.clone` without argument juggling or support
+   * for `thisArg` binding.
+   *
+   * @private
+   * @param {*} value The value to clone.
+   * @param {boolean} [isDeep=false] Specify a deep clone.
+   * @param {Function} [callback] The function to customize cloning values.
+   * @param {Array} [stackA=[]] Tracks traversed source objects.
+   * @param {Array} [stackB=[]] Associates clones with source counterparts.
+   * @returns {*} Returns the cloned value.
+   */
+  function baseClone(value, isDeep, callback, stackA, stackB) {
+    if (callback) {
+      var result = callback(value);
+      if (typeof result != 'undefined') {
+        return result;
+      }
+    }
+    // inspect [[Class]]
+    var isObj = isObject(value);
+    if (isObj) {
+      var className = toString.call(value);
+      if (!cloneableClasses[className] || !support.nodeClass && isNode(value)) {
+        return value;
+      }
+      var ctor = ctorByClass[className];
+      switch (className) {
+      case boolClass:
+      case dateClass:
+        return new ctor(+value);
+      case numberClass:
+      case stringClass:
+        return new ctor(value);
+      case regexpClass:
+        result = ctor(value.source, reFlags.exec(value));
+        result.lastIndex = value.lastIndex;
+        return result;
+      }
+    } else {
+      return value;
+    }
+    var isArr = isArray(value);
+    if (isDeep) {
+      // check for circular references and return corresponding clone
+      var initedStack = !stackA;
+      stackA || (stackA = getArray());
+      stackB || (stackB = getArray());
+      var length = stackA.length;
+      while (length--) {
+        if (stackA[length] == value) {
+          return stackB[length];
+        }
+      }
+      result = isArr ? ctor(value.length) : {};
+    } else {
+      result = isArr ? slice(value) : assign({}, value);
+    }
+    // add array properties assigned by `RegExp#exec`
+    if (isArr) {
+      if (hasOwnProperty.call(value, 'index')) {
+        result.index = value.index;
+      }
+      if (hasOwnProperty.call(value, 'input')) {
+        result.input = value.input;
+      }
+    }
+    // exit for shallow clone
+    if (!isDeep) {
+      return result;
+    }
+    // add the source value to the stack of traversed objects
+    // and associate it with its clone
+    stackA.push(value);
+    stackB.push(result);
+    // recursively populate clone (susceptible to call stack limits)
+    (isArr ? baseEach : forOwn)(value, function (objValue, key) {
+      result[key] = baseClone(objValue, isDeep, callback, stackA, stackB);
+    });
+    if (initedStack) {
+      releaseArray(stackA);
+      releaseArray(stackB);
+    }
+    return result;
+  }
+  return baseClone;
+}(lodashObjectsAssign, lodashInternalsBaseEach, lodashObjectsForOwn, lodashInternalsGetArray, lodashObjectsIsArray, lodashInternalsIsNode, lodashObjectsIsObject, lodashInternalsReleaseArray, lodashInternalsSlice, lodashSupport);
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize exports="amd" -o ./compat/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var lodashObjectsCloneDeep;
+lodashObjectsCloneDeep = function (baseClone, baseCreateCallback) {
+  /**
+   * Creates a deep clone of `value`. If a callback is provided it will be
+   * executed to produce the cloned values. If the callback returns `undefined`
+   * cloning will be handled by the method instead. The callback is bound to
+   * `thisArg` and invoked with one argument; (value).
+   *
+   * Note: This method is loosely based on the structured clone algorithm. Functions
+   * and DOM nodes are **not** cloned. The enumerable properties of `arguments` objects and
+   * objects created by constructors other than `Object` are cloned to plain `Object` objects.
+   * See http://www.w3.org/TR/html5/infrastructure.html#internal-structured-cloning-algorithm.
+   *
+   * @static
+   * @memberOf _
+   * @category Objects
+   * @param {*} value The value to deep clone.
+   * @param {Function} [callback] The function to customize cloning values.
+   * @param {*} [thisArg] The `this` binding of `callback`.
+   * @returns {*} Returns the deep cloned value.
+   * @example
+   *
+   * var characters = [
+   *   { 'name': 'barney', 'age': 36 },
+   *   { 'name': 'fred',   'age': 40 }
+   * ];
+   *
+   * var deep = _.cloneDeep(characters);
+   * deep[0] === characters[0];
+   * // => false
+   *
+   * var view = {
+   *   'label': 'docs',
+   *   'node': element
+   * };
+   *
+   * var clone = _.cloneDeep(view, function(value) {
+   *   return _.isElement(value) ? value.cloneNode(true) : undefined;
+   * });
+   *
+   * clone.node == view.node;
+   * // => false
+   */
+  function cloneDeep(value, callback, thisArg) {
+    return baseClone(value, true, typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1));
+  }
+  return cloneDeep;
+}(lodashInternalsBaseClone, lodashInternalsBaseCreateCallback);
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize exports="amd" -o ./compat/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
 var lodashFunctionsWrap;
 lodashFunctionsWrap = function (createWrapper) {
   /**
@@ -1957,7 +2134,7 @@ endpointsUtilsParam = function () {
  * Copyright (c) 2014
  */
 var endpointsResource;
-endpointsResource = function (bind, assign, decorate, param) {
+endpointsResource = function (bind, cloneDeep, merge, decorate, param) {
   // ----------------------------------------------------------------------------
   // Resource
   //
@@ -1985,13 +2162,15 @@ endpointsResource = function (bind, assign, decorate, param) {
   Resource.prototype._create = function (endpoint) {
     // Return function that calls endpoint
     return bind(function (opts, returns) {
-      // Call data obj copies current configuration
-      var options = assign({}, this.configuration.options);
-      // Set endpoint base props
+      // Create a new clone of our original config
+      // and merge our endpoint in.
+      var options = cloneDeep(this.configuration.options);
+      merge(options, endpoint);
+      // Our base url + our endpoint path = final url
       options.url += endpoint.path;
-      options.type = endpoint.type;
+      delete options.path;
       // Add user opts to call options
-      assign(options, opts);
+      merge(options, opts);
       // Alter opts before request call. Before is called
       // with the context of the endpoints instance, so that
       // the endpoint may have access to any values attached
@@ -2048,7 +2227,7 @@ endpointsResource = function (bind, assign, decorate, param) {
   // Expose
   // ----------------------------------------------------------------------------
   return Resource;
-}(lodashFunctionsBind, lodashObjectsAssign, endpointsUtilsDecorate, endpointsUtilsParam);
+}(lodashFunctionsBind, lodashObjectsCloneDeep, lodashObjectsMerge, endpointsUtilsDecorate, endpointsUtilsParam);
 /*!
  * endpoints.js
  * 

@@ -1,6 +1,6 @@
 {
   "name": "endpoints.js",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "homepage": "https://github.com/firstopinion/endpoints.js",
   "description": "Module for creating browser based api clients.",
   "author": "Jarid Margolin <jarid@firstopinion.co>",
