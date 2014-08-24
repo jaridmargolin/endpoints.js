@@ -1,102 +1,47 @@
-endpoints.js [![Build Status](https://travis-ci.org/firstopinion/endpoints.js.svg)](https://travis-ci.org/firstopinion/endpoints.js) [![Dependency Status](https://david-dm.org/firstopinion/endpoints.js.svg)](https://david-dm.org/firstopinion/endpoints.js) [![devDependency Status](https://david-dm.org/firstopinion/endpoints.js/dev-status.svg)](https://david-dm.org/firstopinion/endpoints.js#info=devDependencies)
-============
+endpoints.js [![Build Status](https://travis-ci.org/jaridmargolin/endpoints.js.png)](https://travis-ci.org/jaridmargolin/endpoints.js)
+========================
 
-Module for creating browser based api clients.
+JSON configured API interface.
 
-* Normalizes interface for passing data to various methods (GET, POST, DEL)
-* Provides global default opts for api calls.
-* Easy integration with Backbone
-
----
-
-
-Dependencies
-------------
-
-* jquery
-
----
-
-
-Installation
-------------
-
-`bower install endpoints.js`
-
-`npm install endpoints.js`
-
----
-
-
-Usage Example
--------------
-
-Use HTTP Auth for initial authorization and token for subsequent calls.
-
-### Create Resources
 
 ```
-var user = {
-  // Define resource endpoint
-  login: {
-    path: '/LOGIN/PATH',
-    type: 'POST',
-    before: function (opts) {
-      // We authorize using HTTP
-      opts.headers = opts.headers || {};
-      opts.headers['Authorization'] = 'Basic ' + window.btoa(opts.username + ':' + opts.password);
+{
+  "/api/endpoint/uri": {
+    "options": {
+      "POST": {
+        "headers": {
+          "Accept": u"application/json;version=v1",
+          "Content-Type": "application/json"
+        },
+        "authorization": "Bearer" | "Basic",
+        "params": { "bar": True|False }
+      }
     }
   }
-};
+}
 ```
 
 
-### Initialize API
 
+## TESTS
 
-```
-var api = new Endpoints({
-  // Authorization credentials
-  authorization: {
-    username: 'USERNAME',
-    password: 'PASSWORD',
-    endpoint: 'user.login'
-  },
-
-  // Default opts for all calls
-  defaults: {
-    url: 'BASEURL',
-    dataType : 'json',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  },
-
-  // Individual resources
-  resources: {
-    user: user
-  }
-});
-```
-
-### Authorize
-
+**Install Dependencies**
 
 ```
-api.authorize({
-  success: function (data) {
-    api.set('defaults.headers.Authorization', 'Bearer ' + data.access_token);
-  }
-})
+npm install
 ```
 
----
+**Run/View**
+
+```
+npm test
+```
 
 
-License
--------
 
-The MIT License (MIT) Copyright (c) 2013 First Opinion
+## License
+
+The MIT License (MIT) Copyright (c) 2014 First Opinion
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

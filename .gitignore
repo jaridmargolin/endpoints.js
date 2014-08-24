@@ -15,9 +15,10 @@ logs
 results
 
 npm-debug.log
+sauce_connect.log
 node_modules
 bower_components
+runners
 tmp
-sauce-connect.log
 
 /dist
