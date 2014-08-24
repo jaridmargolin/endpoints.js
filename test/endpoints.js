@@ -1,116 +1,319 @@
-/*
- * test/endpoints.js:
- *
+/*!
+ * test/endpoints.js
+ * 
  * Copyright (c) 2014
- * MIT LICENCE
- *
  */
 
 define([
+  'jquery',
   'proclaim',
   'sinon',
-  'endpoints/configuration',
-  'endpoints/resource',
-  'endpoints/endpoints'
-], function (assert, sinon, Configuration, Resource, Endpoints) {
+  'mini-store/mini-store',
+  'fixtures/resources',
+  'endpoints'
+], function ($, assert, sinon, MiniStore, resources, Endpoints) {
 
 
-// ----------------------------------------------------------------------------
-// Reusable
-// ----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
+ * reusable
+ * ---------------------------------------------------------------------------*/
 
-var ajax, resources, decorators;
+var options = {
+  'url': 'http://endpoints.com',
+  'dataType': 'json',
+  'timeout': 5000,
+  'client_id': 'id',
+  'client_secret': 'secret',
+  'resources': resources
+};
 
-
-// ----------------------------------------------------------------------------
-// Test
-// ----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
+ * test
+ * ---------------------------------------------------------------------------*/
 
 describe('endpoints.js', function () {
 
+  beforeEach(function () {
+    this.endpoints = new Endpoints($.ajax, options);
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * constructor
+   * -------------------------------------------------------------------------*/
+
   describe('constructor', function () {
 
+    it('Should set ajax on instance.', function () {
+      assert.equal(this.endpoints.ajax, $.ajax);
+    });
+
+    it('Should create and set new MiniStore `store` on instance.', function () {
+      assert.isInstanceOf(this.endpoints.store, MiniStore);
+      assert.deepEqual(this.endpoints.store.data, {
+        'client_id': 'id',
+        'client_secret': 'secret'
+      });
+    });
+
+    it('Should create and set new MiniStore `defaults` on instance.', function () {
+      assert.isInstanceOf(this.endpoints.store, MiniStore);
+      assert.deepEqual(this.endpoints.defaults.data, {
+        'url': 'http://endpoints.com',
+        'dataType': 'json',
+        'timeout': 5000,
+      });
+    });
+
+    it('Should create and set new MiniStore `resources` on instance.', function () {
+      assert.isInstanceOf(this.endpoints.store, MiniStore);
+      assert.deepEqual(this.endpoints.resources.data, resources);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * _getResource
+   * -------------------------------------------------------------------------*/
+
+  describe('_getResource', function () {
+
+    it('Should throw ReferenceError if resource does not exist.', function () {
+      var self = this;
+      var expected = 'No resource exists at `/error`.';
+
+      assert.throws(function () {
+        var resource = self.endpoints._getResource('/error');
+      }, ReferenceError, expected);
+    });
+
+    it('Should return resource if exists.', function () {
+      var expected = resources['/endpoint'];
+
+      var resource = this.endpoints._getResource('/endpoint');
+      assert.deepEqual(resource, expected);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * _getEndpoint
+   * -------------------------------------------------------------------------*/
+
+  describe('_getEndpoint', function () {
+
     beforeEach(function () {
-      sinon.stub(Endpoints, 'Resource');
-      sinon.stub(Endpoints, 'Configuration', function () {
-        this.prop = 'val';
-      });
-
-      Endpoints.Configuration.prototype.set = sinon.stub();
-      Endpoints.Configuration.prototype.reset = sinon.stub();
-
-      ajax = sinon.stub();
-
-      resources = {
-        user: {},
-        professional: {},
-        messages: {}
-      };
-
-      decorators = {
-        beforeSend: sinon.stub()
-      };
+      this.path = '/endpoint';
+      this.resource = this.endpoints._getResource(this.path);
     });
 
-    afterEach(function () {
-      Endpoints.Resource.restore();
-      Endpoints.Configuration.restore();
+    it('Should throw ReferenceError if endpoint does not exist.', function () {
+      var self = this;
+      var expected = 'Resource `/endpoint` does not have a `GET` endpoint.';
+
+      assert.throws(function () {
+        var endpoint = self.endpoints._getEndpoint(self.path, self.resource, 'GET');
+      }, ReferenceError, expected);
     });
 
-    it('Should call Configuration constructor passing all options excluding decorators and resources.', function () {
-      var endpoints = new Endpoints(ajax, {
-        resources: resources,
-        decorators: decorators,
-        headers: {
-          'Authentication': 'Basic 1'
-        }
-      });
+    it('Should return endpoint if exists.', function () {
+      var expected = resources['/endpoint']['options']['POST'];
 
-      assert.ok(Endpoints.Configuration.calledOnce);
-      assert.deepEqual(Endpoints.Configuration.args[0][0], {
-        headers: {
-          'Authentication': 'Basic 1'
-        }
+      var endpoint = this.endpoints._getEndpoint(this.path, this.resource, 'POST');
+      assert.deepEqual(endpoint, expected);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * _hasRequired
+   * -------------------------------------------------------------------------*/
+
+  describe('_hasRequired', function () {
+
+    beforeEach(function () {
+      var path = '/endpoint';
+      var resource = this.endpoints._getResource(path);
+      var endpoint = this.endpoints._getEndpoint(path, resource, 'POST');
+
+      this.params = endpoint['params'];
+    });
+
+    it('Should throw Error if required param is missing.', function () {
+      var self = this;
+      var expected = 'Required param `foo` missing.';
+
+      assert.throws(function () {
+        self.endpoints._hasRequired(self.params, {});
+      }, Error, expected);
+    });
+
+    it('Should not throw Error if all required params exist.', function () {
+      var self = this;
+
+      assert.doesNotThrow(function () {
+        self.endpoints._hasRequired(self.params, { 'foo': false });
       });
     });
 
-    it('Should set methods configure and reset on instance with the context pointing to Configuration instance.', function () {
-      Endpoints.Configuration.prototype.set = function () {
-        assert.equal(this.prop, 'val');
-      };
-      Endpoints.Configuration.prototype.reset = function () {
-        assert.equal(this.prop, 'val');
-      };
+  });
 
-      var endpoints = new Endpoints(ajax, {
-        resources: resources,
-        decorators: decorators,
-        headers: {
-          'Authentication': 'Basic 1'
-        }
-      });
 
-      endpoints.configure();
-      endpoints.reset();
+  /* ---------------------------------------------------------------------------
+   * _isValid
+   * -------------------------------------------------------------------------*/
+
+  describe('_isValid', function () {
+
+    beforeEach(function () {
+      var path = '/endpoint';
+      var resource = this.endpoints._getResource(path);
+      var endpoint = this.endpoints._getEndpoint(path, resource, 'POST');
+
+      this.params = endpoint['params'];
     });
 
-    it('Should call Resource constructor and attach result to instance for each resource passed.', function () {
-      var endpoints = new Endpoints(ajax, {
-        resources: resources,
-        decorators: decorators,
-        headers: {
-          'Authentication': 'Basic 1'
-        }
+    it('Should throw error if unknown key is passed.', function () {
+      var self = this;
+      var expected = 'The endpoint does not accept the key: `baz`.';
+
+      assert.throws(function () {
+        self.endpoints._isValid(self.params, { 'baz': true });
+      });
+    });
+
+    it('Should not throw Error if all keys are known.', function () {
+      var self = this;
+
+      assert.doesNotThrow(function () {
+        self.endpoints._isValid(self.params, { 'bar': true });
+      });
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * _authBasic
+   * -------------------------------------------------------------------------*/
+
+  describe('_authBasic', function () {
+
+    it('Should return value for Basic Authorization header.', function () {
+      var encoded = window.btoa(options['client_id'] + ':' + options['client_secret']);
+      var expected = 'Basic ' + encoded;
+
+      assert.equal(this.endpoints._authBasic(), expected);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * _authBearer
+   * -------------------------------------------------------------------------*/
+
+  describe('_authBearer', function () {
+
+    it('Should return value for Bearer Authorization header.', function () {
+      var token = 'token';
+      var expected = 'Bearer ' + token;
+
+      this.endpoints.store.add('access_token', token);
+      assert.equal(this.endpoints._authBearer(), expected);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * _options
+   * -------------------------------------------------------------------------*/
+
+  describe('_options', function () {
+
+    beforeEach(function () {
+      this.resourceSpy = sinon.spy(this.endpoints, '_getResource');
+      this.endpointSpy = sinon.spy(this.endpoints, '_getEndpoint');
+      this.requiredSpy = sinon.spy(this.endpoints, '_hasRequired');
+      this.validSpy    = sinon.spy(this.endpoints, '_isValid');
+
+      this.endpoints.store.add('access_token', 'token');
+      this.options = this.endpoints._options('POST', '/endpoint', { 'foo': false });
+    });
+
+    it('Should call getResource.', function () {
+      assert.ok(this.resourceSpy.calledOnce);
+    });
+
+    it('Should call getEndpoint.', function () {
+      assert.ok(this.endpointSpy.calledOnce);
+    });
+
+    it('Should call hasRequired.', function () {
+      assert.ok(this.requiredSpy.calledOnce);
+    });
+
+    it('Should call isValid.', function () {
+      assert.ok(this.validSpy.calledOnce);
+    });
+
+    it('Should return processed options object.', function () {
+      assert.deepEqual(this.options, {
+        'url': 'http://endpoints.com/endpoint',
+        'type': 'POST',
+        'dataType': 'json',
+        'timeout': 5000,
+        'headers': {
+          'Accept': 'application/json;version=v1',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer token'
+        },
+        'data': '{"foo":false}'
+      });
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * options
+   * -------------------------------------------------------------------------*/
+
+  describe('options', function () {
+
+    it('Should return options.', function () {
+      var expected = this.endpoints._options('POST', '/endpoint', { 'foo': false });
+      var options = this.endpoints.options('POST', '/endpoint', { 'foo': false });
+
+      assert.deepEqual(options, expected);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * ajax
+   * -------------------------------------------------------------------------*/
+
+  describe('request', function () {
+
+    it('Should call ajax with prcoessed options mixed with passed options.', function () {
+      var ajaxStub = sinon.stub(this.endpoints, 'ajax');
+
+      var expected = this.endpoints.options('POST', '/endpoint', { 'foo': false });
+      expected.additionalParam = true;
+
+      this.endpoints.request('POST', '/endpoint', {
+        additionalParam: true,
+        data: { 'foo': false },
       });
 
-      var args = Endpoints.Resource.args;
-      assert.equal(args[0][0], ajax);
-      assert.isInstanceOf(args[0][1], Endpoints.Configuration);
-      assert.equal(args[0][2], decorators);
-      assert.equal(args[0][3], resources.user);
-      assert.equal(args[1][3], resources.professional);
-      assert.equal(args[2][3], resources.messages);
-      assert.equal(args[0][4], endpoints);
+      var options = ajaxStub.args[0][0];
+      assert.deepEqual(options, expected);
     });
 
   });

@@ -1,0 +1,10 @@
+{
+  "assist"      : "/node_modules/assist.js/dist/amd",
+  "fixtures"    : "/test/fixtures",
+  "jquery"      : "/node_modules/jquery/dist/jquery",
+  "mini-store"  : "/node_modules/mini-store.js/dist/amd",
+  "pre-flight"  : "/node_modules/pre-flight.js/dist/amd",
+  "proclaim"    : "/node_modules/proclaim/lib/proclaim",
+  "sinon"       : "/node_modules/sinon/pkg/sinon",
+  "stringspace" : "/node_modules/mini-store.js/node_modules/stringspace.js/dist/amd"
+}
