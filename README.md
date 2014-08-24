@@ -1,4 +1,4 @@
-endpoints.js [![Build Status](https://travis-ci.org/jaridmargolin/endpoints.js.png)](https://travis-ci.org/jaridmargolin/endpoints.js)
+endpoints.js [![Build Status](https://travis-ci.org/firstopinion/endpoints.js.png)](https://travis-ci.org/firstopinion/endpoints.js)
 ========================
 
 JSON configured API interface.
