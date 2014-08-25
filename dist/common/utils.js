@@ -4,7 +4,7 @@
  * Copyright (c) 2014
  */
 
-var utils = require('mini-store/utils');
+var jsonClone = require('assist/jsonClone');
 var snip = require('assist/snip');
 
 
@@ -14,7 +14,7 @@ var snip = require('assist/snip');
 
 // proxy already built utils
 var _ = {
-  clone: utils.clone,
+  jsonClone: jsonClone,
   snip: snip
 };
 

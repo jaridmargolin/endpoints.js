@@ -28,7 +28,7 @@ var preflight = require('pre-flight/pre-flight');
  */
 var Endpoints = function (ajax, options) {
   // Avoid modifying original
-  options = _.clone(options);
+  options = _.jsonClone(options);
 
   // allow ajax calls to be made directly through
   // the library.
@@ -82,7 +82,7 @@ Endpoints.prototype.options = function (type, path, data) {
  */
 Endpoints.prototype.request = function (type, path, options) {
   // Avoid manipulating original
-  options = _.clone(options);
+  options = _.jsonClone(options);
 
   // Get processed
   var processed = this._options(type, path, _.snip(options, 'data'));

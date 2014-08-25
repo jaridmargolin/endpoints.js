@@ -15,42 +15,116 @@
 }(this, function () {
 
 /*!
- * stringspace.js
+ * jsonClone.js
  * 
  * Copyright (c) 2014
  */
-var stringspaceUtils, stringspaceStringspace, miniStoreUtils, assistSnip, utils, miniStoreMiniStore, preFlightPreFlight, endpoints;
-stringspaceUtils = function () {
+var assistJsonClone, assistSnip, utils, assistIsObject, assistIsArray, assistDeepMerge, stringspaceUtils, stringspaceStringspace, miniStoreUtils, miniStoreMiniStore, preFlightPreFlight, endpoints;
+assistJsonClone = function (obj) {
+  return JSON.parse(JSON.stringify(obj));
+};
+/*!
+ * snip.js
+ * 
+ * Copyright (c) 2014
+ */
+assistSnip = function (obj, prop) {
+  var val = obj[prop];
+  delete obj[prop];
+  return val;
+};
+/*!
+ * utils.js
+ * 
+ * Copyright (c) 2014
+ */
+utils = function (jsonClone, snip) {
   /* -----------------------------------------------------------------------------
    * utils
    * ---------------------------------------------------------------------------*/
-  var _ = {};
+  // proxy already built utils
+  var _ = {
+      jsonClone: jsonClone,
+      snip: snip
+    };
   /**
-   * Determine if a given value is an Object.
+   * Shallow merge properties from object to
+   * another object.
    *
    * @example
-   * var isObj = isObject(obj);
+   * dest = _.merge(dest, obj);
    *
    * @public
    *
-   * @param {*} value - Value to test.
+   * @param {object} dest - Object to merge properties into.
+   * @param {object} obj - Object to merge properties from.
+   * @returns {object} dest - The passed destination object with
+   *   properties merged.
    */
-  _.isObject = function (value) {
-    return typeof value === 'object';
+  _.merge = function (dest, obj) {
+    for (var k in obj) {
+      dest[k] = obj[k];
+    }
+    return dest;
   };
   /**
-   * Determine if a given value is an Array.
+   * Return a boolean if a given variable is undefined.
    *
    * @example
-   * var isArr = isArray(array);
+   * var isUndefined = _.isUndefined(variable);
    *
    * @public
    *
-   * @param {*} value - Value to test.
+   * @param {*} variable - value to check if undefined of.
+   * @returns {boolean} - result of undefined check.
    */
-  _.isArray = function (value) {
-    return Object.prototype.toString.call(value) === '[object Array]';
+  _.isUndefined = function (variable) {
+    return typeof variable === 'undefined';
   };
+  /**
+   * Return a boolean if a given variable is null.
+   *
+   * @example
+   * var isNull = _.isNull(variable);
+   *
+   * @public
+   *
+   * @param {*} variable - value to check if null of.
+   * @returns {boolean} - result of null check.
+   */
+  _.isNull = function (variable) {
+    return variable === null;
+  };
+  /* -----------------------------------------------------------------------------
+   * export
+   * ---------------------------------------------------------------------------*/
+  return _;
+}(assistJsonClone, assistSnip);
+/*!
+ * isObject.js
+ * 
+ * Copyright (c) 2014
+ */
+assistIsObject = function (value) {
+  return value === Object(value);
+};
+/*!
+ * isArray.js
+ * 
+ * Copyright (c) 2014
+ */
+assistIsArray = function (value) {
+  return Object.prototype.toString.call(value) === '[object Array]';
+};
+/*!
+ * deepMerge.js
+ * 
+ * Copyright (c) 2014
+ */
+assistDeepMerge = function (isArray, isObject) {
+  /* -----------------------------------------------------------------------------
+   * deepMerge
+   * ---------------------------------------------------------------------------*/
   /**
    * Deep merge 2 objects.
    *
@@ -62,20 +136,20 @@ stringspaceUtils = function () {
    * @param {object} dest - Object to merge properties into.
    * @param {object} obj - Object to merge properties from.
    */
-  _.deep = function (dest, obj) {
+  var deepMerge = function (dest, obj) {
     for (var k in obj) {
       var destVal = dest[k] || {};
       var objVal = obj[k];
-      var isObj = _.isObject(objVal);
-      var isArr = _.isArray(objVal);
+      var isObj = isObject(objVal);
+      var isArr = isArray(objVal);
       if (isObj || isArr) {
-        if (isObj && !_.isObject(destVal)) {
+        if (isObj && !isObject(destVal)) {
           dest[k] = {};
         }
-        if (isArr && !_.isArray(destVal)) {
+        if (isArr && !isArray(destVal)) {
           dest[k] = [];
         }
-        dest[k] = _.deep(destVal, objVal);
+        dest[k] = deepMerge(destVal, objVal);
       } else {
         dest[k] = objVal;
       }
@@ -83,10 +157,25 @@ stringspaceUtils = function () {
     return dest;
   };
   /* -----------------------------------------------------------------------------
-   * export
+   * deepMerge
    * ---------------------------------------------------------------------------*/
-  return _;
-}();
+  return deepMerge;
+}(assistIsArray, assistIsObject);
+/*!
+ * utils.js
+ * 
+ * Copyright (c) 2014
+ */
+stringspaceUtils = function (isArray, isObject, deepMerge) {
+  /* -----------------------------------------------------------------------------
+   * utils
+   * ---------------------------------------------------------------------------*/
+  return {
+    isObject: isObject,
+    isArray: isArray,
+    deepMerge: deepMerge
+  };
+}(assistIsArray, assistIsObject, assistDeepMerge);
 /*!
  * stringspace.js
  * 
@@ -154,7 +243,7 @@ stringspaceStringspace = function (_) {
     this._loop(obj, key, {
       last: function (obj, parts, i) {
         var curVal = obj[parts[i]];
-        return typeof curVal !== 'object' || !deep ? obj[parts[i]] = val : obj[parts[i]] = _.deep(curVal, val);
+        return typeof curVal !== 'object' || !deep ? obj[parts[i]] = val : obj[parts[i]] = _.deepMerge(curVal, val);
       },
       missing: function (obj, parts, i) {
         obj[parts[i]] = {};
@@ -221,7 +310,7 @@ stringspaceStringspace = function (_) {
  * 
  * Copyright (c) 2014
  */
-miniStoreUtils = function (Stringspace) {
+miniStoreUtils = function (isObject, jsonClone, Stringspace) {
   /* -----------------------------------------------------------------------------
    * scope
    * ---------------------------------------------------------------------------*/
@@ -229,167 +318,82 @@ miniStoreUtils = function (Stringspace) {
   /* -----------------------------------------------------------------------------
    * utils
    * ---------------------------------------------------------------------------*/
-  return {
-    /**
-     * Clone object containing variables only. Will not work with
-     * functions or undefined values.
-     *
-     * @example
-     * cloned = clone(obj);
-     *
-     * @public
-     *
-     * @param {object} obj - Object to clone.
-     */
-    clone: function (obj) {
-      return JSON.parse(JSON.stringify(obj));
-    },
-    /**
-     * Loop over object keys and set on obj.
-     *
-     * @example
-     * extend(dest, {
-     *   'nested:key': 'value',
-     *   'notnested': 'value'
-     * });
-     *
-     * @public
-     *
-     * @param {object} dest - Object to add properties to.
-     * @param {object} obj - Properties to add to dest object.
-     */
-    extend: function (dest, obj) {
-      for (var key in obj) {
-        stringspace.set(dest, key, obj[key], true);
-      }
-      return dest;
-    },
-    /**
-     * Proxy stringspace.get().
-     *
-     * @example
-     * var value = get(obj, 'nested:key');
-     *
-     * @public
-     *
-     * @param {object} dest - Object to retrieve properties from.
-     * @param {string} key - Name representing key to retrieve.
-     */
-    get: function (obj, key) {
-      return stringspace.get(obj, key);
-    },
-    /**
-     * Proxy stringspace.set().
-     *
-     * @example
-     * set(obj, 'nested:key', 'value');
-     *
-     * @public
-     *
-     * @param {object} obj - The object to add data to.
-     * @param {string} key - Formatted string representing a key in
-     *   the object.
-     * @param {*} val - Value of the specified key.
-     * @param {boolean} deep - Indicated if conflicts should be reserved
-     *   with a deep merge or an overwrite.
-     * 
-     */
-    set: function (obj, key, value, deep) {
-      return stringspace.set(obj, key, value, deep);
-    },
-    /**
-     * Proxy stringspace.remove().
-     *
-     * @example
-     * remove('nested');
-     *
-     * @public
-     *
-     * @param {object} obj - The object to remove value from.
-     * @param {string} key - String representing the key to remove.
-     */
-    remove: function (obj, key) {
-      return stringspace.remove(obj, key);
-    }
-  };
-}(stringspaceStringspace);
-/*!
- * snip.js
- * 
- * Copyright (c) 2014
- */
-assistSnip = function (obj, prop) {
-  var val = obj[prop];
-  delete obj[prop];
-  return val;
-};
-/*!
- * utils.js
- * 
- * Copyright (c) 2014
- */
-utils = function (utils, snip) {
-  /* -----------------------------------------------------------------------------
-   * utils
-   * ---------------------------------------------------------------------------*/
-  // proxy already built utils
   var _ = {
-      clone: utils.clone,
-      snip: snip
+      isObject: isObject,
+      jsonClone: jsonClone
     };
   /**
-   * Shallow merge properties from object to
-   * another object.
+   * Loop over object keys and set on obj.
    *
    * @example
-   * dest = _.merge(dest, obj);
+   * extend(dest, {
+   *   'nested:key': 'value',
+   *   'notnested': 'value'
+   * });
    *
    * @public
    *
-   * @param {object} dest - Object to merge properties into.
-   * @param {object} obj - Object to merge properties from.
-   * @returns {object} dest - The passed destination object with
-   *   properties merged.
+   * @param {object} dest - Object to add properties to.
+   * @param {object} obj - Properties to add to dest object.
    */
-  _.merge = function (dest, obj) {
-    for (var k in obj) {
-      dest[k] = obj[k];
+  _.mix = function (dest, obj, flat) {
+    for (var key in obj) {
+      stringspace.set(dest, key, obj[key], !flat);
     }
     return dest;
   };
   /**
-   * Return a boolean if a given variable is undefined.
+   * Proxy stringspace.get().
    *
    * @example
-   * var isUndefined = _.isUndefined(variable);
+   * var value = get(obj, 'nested:key');
    *
    * @public
    *
-   * @param {*} variable - value to check if undefined of.
-   * @returns {boolean} - result of undefined check.
+   * @param {object} dest - Object to retrieve properties from.
+   * @param {string} key - Name representing key to retrieve.
    */
-  _.isUndefined = function (variable) {
-    return typeof variable === 'undefined';
+  _.get = function (obj, key) {
+    return stringspace.get(obj, key);
   };
   /**
-   * Return a boolean if a given variable is null.
+   * Proxy stringspace.set().
    *
    * @example
-   * var isNull = _.isNull(variable);
+   * set(obj, 'nested:key', 'value');
    *
    * @public
    *
-   * @param {*} variable - value to check if null of.
-   * @returns {boolean} - result of null check.
+   * @param {object} obj - The object to add data to.
+   * @param {string} key - Formatted string representing a key in
+   *   the object.
+   * @param {*} val - Value of the specified key.
+   * @param {boolean} deep - Indicated if conflicts should be reserved
+   *   with a deep merge or an overwrite.
+   * 
    */
-  _.isNull = function (variable) {
-    return variable === null;
+  _.set = function (obj, key, value, deep) {
+    return stringspace.set(obj, key, value, deep);
+  };
+  /**
+   * Proxy stringspace.remove().
+   *
+   * @example
+   * remove('nested');
+   *
+   * @public
+   *
+   * @param {object} obj - The object to remove value from.
+   * @param {string} key - String representing the key to remove.
+   */
+  _.remove = function (obj, key) {
+    return stringspace.remove(obj, key);
   };
   /* -----------------------------------------------------------------------------
    * export
    * ---------------------------------------------------------------------------*/
   return _;
-}(miniStoreUtils, assistSnip);
+}(assistIsObject, assistJsonClone, stringspaceStringspace);
 /*!
  * mini-store.js
  * 
@@ -415,7 +419,7 @@ miniStoreMiniStore = function (_) {
    *   will be converted to an object.
    */
   var MiniStore = function (defaults) {
-    this.original = _.extend({}, defaults);
+    this.original = _.mix({}, defaults);
     // initialize by calling reset
     this.reset();
   };
@@ -435,12 +439,14 @@ miniStoreMiniStore = function (_) {
    * If an array of namespace keys is passed it will be converted
    * to an object.
    */
-  MiniStore.prototype.add = function (key, value) {
-    // If a key and value
-    if (value) {
-      _.set(this.data, key, value);
+  MiniStore.prototype.add = function (key, value, flat) {
+    // Mixin with current data
+    if (_.isObject(key)) {
+      // Key actually is an object of key value pairs
+      // and value is the flat flag (by default mix is deep).
+      _.mix(this.data, key, value);
     } else {
-      _.extend(this.data, key);
+      _.set(this.data, key, value);
     }
     // Allow chaining
     return this;
@@ -470,7 +476,7 @@ miniStoreMiniStore = function (_) {
    * @public
    */
   MiniStore.prototype.reset = function () {
-    this.data = _.clone(this.original);
+    this.data = _.jsonClone(this.original);
   };
   /* -----------------------------------------------------------------------------
    * export
@@ -512,7 +518,7 @@ endpoints = function (_, MiniStore, preflight) {
    */
   var Endpoints = function (ajax, options) {
     // Avoid modifying original
-    options = _.clone(options);
+    options = _.jsonClone(options);
     // allow ajax calls to be made directly through
     // the library.
     this.ajax = ajax;
@@ -558,7 +564,7 @@ endpoints = function (_, MiniStore, preflight) {
    */
   Endpoints.prototype.request = function (type, path, options) {
     // Avoid manipulating original
-    options = _.clone(options);
+    options = _.jsonClone(options);
     // Get processed
     var processed = this._options(type, path, _.snip(options, 'data'));
     // Merging process with options allows for

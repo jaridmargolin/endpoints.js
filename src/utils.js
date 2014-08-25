@@ -5,9 +5,9 @@
  */
 
 define([
-  'mini-store/utils',
+  'assist/jsonClone',
   'assist/snip'
-], function (utils, snip) {
+], function (jsonClone, snip) {
 
 
 /* -----------------------------------------------------------------------------
@@ -16,7 +16,7 @@ define([
 
 // proxy already built utils
 var _ = {
-  clone: utils.clone,
+  jsonClone: jsonClone,
   snip: snip
 };
 
