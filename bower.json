@@ -1,9 +1,9 @@
 {
   "name": "endpoints.js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "dependencies": {
-    "assist.js": "~0.1.3",
-    "mini-store.js": "~0.0.2",
+    "assist.js": "~0.2.0",
+    "mini-store.js": "~0.2.0",
     "pre-flight.js": "~0.0.1"
   },
   "ignore": [
