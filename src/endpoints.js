@@ -84,7 +84,7 @@ Endpoints.prototype.options = function (type, path, data) {
  */
 Endpoints.prototype.request = function (type, path, options) {
   // Avoid manipulating original
-  options = _.jsonClone(options);
+  options = _.merge({}, options);
 
   // Get processed
   var processed = this._options(type, path, _.snip(options, 'data'));
