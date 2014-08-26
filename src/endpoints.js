@@ -121,7 +121,6 @@ Endpoints.prototype._options = function (type, path, data) {
 
   // create
   var url = options.data['url'] + path;
-  var authHeader = this['_auth' + endpoint.authorization]();
 
   // populate options
   options.add('url', url);
@@ -129,6 +128,12 @@ Endpoints.prototype._options = function (type, path, data) {
   options.add('data', data);
   options.add('headers', endpoint.headers);
   options.add('headers:Authorization', authHeader);
+
+  // Optional auth
+  if (endpoint.authorization) {
+    var authHeader = this['_auth' + endpoint.authorization]();
+    options.add('headers:Authorization', authHeader);
+  }
 
   return preflight(options.data);
 };
