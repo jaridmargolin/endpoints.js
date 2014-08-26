@@ -1,10 +1,10 @@
 {
   "name": "endpoints.js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
     "assist.js": "~0.2.0",
     "mini-store.js": "~0.2.0",
-    "pre-flight.js": "~0.0.1"
+    "pre-flight.js": "~0.0.2"
   },
   "ignore": [
     "**/.*",
