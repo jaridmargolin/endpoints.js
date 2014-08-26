@@ -489,7 +489,8 @@ miniStoreMiniStore = function (_) {
  * Copyright (c) 2014
  */
 preFlightPreFlight = function (options) {
-  if ((options.type === 'POST' || 'PUT') && options.data) {
+  var type = options.type;
+  if ((type === 'POST' || type === 'PUT') && options.data) {
     options.data = JSON.stringify(options.data);
   }
   return options;
@@ -564,7 +565,7 @@ endpoints = function (_, MiniStore, preflight) {
    */
   Endpoints.prototype.request = function (type, path, options) {
     // Avoid manipulating original
-    options = _.jsonClone(options);
+    options = _.merge({}, options);
     // Get processed
     var processed = this._options(type, path, _.snip(options, 'data'));
     // Merging process with options allows for
@@ -593,13 +594,16 @@ endpoints = function (_, MiniStore, preflight) {
     var options = new MiniStore(this.defaults.data);
     // create
     var url = options.data['url'] + path;
-    var authHeader = this['_auth' + endpoint.authorization]();
     // populate options
     options.add('url', url);
     options.add('type', type);
     options.add('data', data);
     options.add('headers', endpoint.headers);
-    options.add('headers:Authorization', authHeader);
+    // Optional auth
+    if (endpoint.authorization) {
+      var authHeader = this['_auth' + endpoint.authorization]();
+      options.add('headers:Authorization', authHeader);
+    }
     return preflight(options.data);
   };
   /**

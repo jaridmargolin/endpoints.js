@@ -127,7 +127,6 @@ Endpoints.prototype._options = function (type, path, data) {
   options.add('type', type);
   options.add('data', data);
   options.add('headers', endpoint.headers);
-  options.add('headers:Authorization', authHeader);
 
   // Optional auth
   if (endpoint.authorization) {

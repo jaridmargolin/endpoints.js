@@ -82,7 +82,7 @@ Endpoints.prototype.options = function (type, path, data) {
  */
 Endpoints.prototype.request = function (type, path, options) {
   // Avoid manipulating original
-  options = _.jsonClone(options);
+  options = _.merge({}, options);
 
   // Get processed
   var processed = this._options(type, path, _.snip(options, 'data'));
@@ -119,14 +119,18 @@ Endpoints.prototype._options = function (type, path, data) {
 
   // create
   var url = options.data['url'] + path;
-  var authHeader = this['_auth' + endpoint.authorization]();
 
   // populate options
   options.add('url', url);
   options.add('type', type);
   options.add('data', data);
   options.add('headers', endpoint.headers);
-  options.add('headers:Authorization', authHeader);
+
+  // Optional auth
+  if (endpoint.authorization) {
+    var authHeader = this['_auth' + endpoint.authorization]();
+    options.add('headers:Authorization', authHeader);
+  }
 
   return preflight(options.data);
 };

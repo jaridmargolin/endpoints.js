@@ -1,6 +1,6 @@
 {
   "name": "endpoints.js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "dependencies": {
     "assist.js": "~0.2.0",
     "mini-store.js": "~0.2.0",
