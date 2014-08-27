@@ -2,7 +2,7 @@
   "name": "endpoints.js",
   "description": "JSON configured API interface.",
   "author": "Jarid Margolin <jarid@firstopinion.co>",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "homepage": "https://github.com/firstopinion/endpoints.js",
   "repository": {
     "type": "git",
@@ -16,9 +16,10 @@
   },
   "main": "dist/common/endpoints.js",
   "dependencies": {
-    "assist.js": "~0.2.0",
-    "mini-store.js": "~0.2.0",
-    "pre-flight.js": "~0.0.2"
+    "assist.js": "~0.3.0",
+    "mini-store.js": "~0.2.1",
+    "pre-flight.js": "~0.0.2",
+    "stringspace.js": "~0.2.2"
   },
   "devDependencies": {
     "easy-build": "~0.0.3",
