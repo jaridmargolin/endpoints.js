@@ -79,6 +79,14 @@ describe('endpoints.js', function () {
 
   describe('_getResource', function () {
 
+    it('Should return resource if exists at key.', function () {
+      var expected = resources['/endpoint'];
+
+      var resource = this.endpoints._getResource('/endpoint');
+      assert.deepEqual(resource, expected);
+    });
+
+
     it('Should throw ReferenceError if resource does not exist.', function () {
       var self = this;
       var expected = 'No resource exists at `/error`.';
@@ -86,13 +94,6 @@ describe('endpoints.js', function () {
       assert.throws(function () {
         var resource = self.endpoints._getResource('/error');
       }, ReferenceError, expected);
-    });
-
-    it('Should return resource if exists.', function () {
-      var expected = resources['/endpoint'];
-
-      var resource = this.endpoints._getResource('/endpoint');
-      assert.deepEqual(resource, expected);
     });
 
   });
@@ -242,7 +243,10 @@ describe('endpoints.js', function () {
       this.validSpy    = sinon.spy(this.endpoints, '_isValid');
 
       this.endpoints.store.add('access_token', 'token');
-      this.options = this.endpoints._options('POST', '/endpoint', { 'foo': false });
+      this.options = this.endpoints._options('POST', '/endpoint', {
+        args: ['foo', 'bar'],
+        data: { 'foo': false }
+      });
     });
 
     it('Should call getResource.', function () {
@@ -263,7 +267,7 @@ describe('endpoints.js', function () {
 
     it('Should return processed options object.', function () {
       assert.deepEqual(this.options, {
-        'url': 'http://endpoints.com/endpoint',
+        'url': 'http://endpoints.com/endpoint/foo/bar',
         'type': 'POST',
         'dataType': 'json',
         'timeout': 5000,
@@ -286,8 +290,12 @@ describe('endpoints.js', function () {
   describe('options', function () {
 
     it('Should return options.', function () {
-      var expected = this.endpoints._options('POST', '/endpoint', { 'foo': false });
-      var options = this.endpoints.options('POST', '/endpoint', { 'foo': false });
+      var expected = this.endpoints._options('POST', '/endpoint', {
+        data: { 'foo': false }
+      });
+      var options = this.endpoints.options('POST', '/endpoint', {
+        data: { 'foo': false }
+      });
 
       assert.deepEqual(options, expected);
     });
@@ -304,7 +312,9 @@ describe('endpoints.js', function () {
     it('Should call ajax with prcoessed options mixed with passed options.', function () {
       var ajaxStub = sinon.stub(this.endpoints, 'ajax');
 
-      var expected = this.endpoints.options('POST', '/endpoint', { 'foo': false });
+      var expected = this.endpoints.options('POST', '/endpoint', {
+        data: { 'foo': false }
+      });
       expected.additionalParam = true;
 
       this.endpoints.request('POST', '/endpoint', {

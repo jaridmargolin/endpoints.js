@@ -468,6 +468,22 @@ miniStoreMiniStore = function (_) {
   MiniStore.prototype.reset = function () {
     this.data = _.jsonClone(this.original);
   };
+  /**
+   * Get value from store.
+   *
+   * @example
+   * store.get('key');
+   *
+   * @public
+   * 
+   * @param {string} name - String representation of key to return
+   * from store. If no key is passed, the entire data object will
+   * be returned.
+   * @returns {*} - queried value.
+   */
+  MiniStore.prototype.get = function (name) {
+    return name ? _.get(this.data, name) : this.data;
+  };
   /* -----------------------------------------------------------------------------
    * export
    * ---------------------------------------------------------------------------*/
@@ -536,10 +552,10 @@ endpoints = function (_, MiniStore, preflight) {
    *
    * @param {string} type - Request method name.
    * @param {string} path - Path of endpoint.
-   * @param {object} data - Data for endpoint.
+   * @param {object} options - $.ajax options.
    */
-  Endpoints.prototype.options = function (type, path, data) {
-    return this._options.apply(this, arguments);
+  Endpoints.prototype.options = function (type, path, options) {
+    return this._options(type, path, options);
   };
   /**
    * Request resource with process options.
@@ -554,13 +570,7 @@ endpoints = function (_, MiniStore, preflight) {
    * @param {object} options - $.ajax options.
    */
   Endpoints.prototype.request = function (type, path, options) {
-    // Avoid manipulating original
-    options = _.merge({}, options);
-    // Get processed
-    var processed = this._options(type, path, _.snip(options, 'data'));
-    // Merging process with options allows for
-    // response handlers to be applied.
-    return this.ajax(_.merge(processed, options));
+    return this.ajax(this._options(type, path, options));
   };
   /**
    * Return processed options.
@@ -571,7 +581,13 @@ endpoints = function (_, MiniStore, preflight) {
    * @param {string} path - Path of endpoint.
    * @param {object} data - Data for endpoint.
    */
-  Endpoints.prototype._options = function (type, path, data) {
+  Endpoints.prototype._options = function (type, path, options) {
+    // Avoid manipulating original
+    options = _.merge({}, options);
+    // Snip out specific options props for manipulation.
+    var data = _.snip(options, 'data');
+    var args = _.snip(options, 'args');
+    // Grab our endpoint.
     var resource = this._getResource(path);
     var endpoint = this._getEndpoint(path, resource, type);
     var params = endpoint.params;
@@ -581,20 +597,18 @@ endpoints = function (_, MiniStore, preflight) {
     this._hasRequired(params, data);
     this._isValid(params, data);
     // temp store used for manipulating options
-    var options = new MiniStore(this.defaults.data);
-    // create
-    var url = options.data['url'] + path;
-    // populate options
-    options.add('url', url);
-    options.add('type', type);
-    options.add('data', data);
-    options.add('headers', endpoint.headers);
-    // Optional auth
-    if (endpoint.authorization) {
-      var authHeader = this['_auth' + endpoint.authorization]();
-      options.add('headers:Authorization', authHeader);
-    }
-    return preflight(options.data);
+    var processed = new MiniStore(this.defaults.get());
+    // populate processed
+    processed.add('url', processed.get('url') + path);
+    processed.add('type', type);
+    processed.add('data', data);
+    processed.add('headers', endpoint.headers);
+    // optionals
+    this._addAuth(endpoint, processed);
+    this._addArgs(args, processed);
+    // Make sure that any passed options overwrite
+    // our proccessed.
+    return _.merge(preflight(processed.get()), options);
   };
   /**
    * Get resource with specified path and throw a
@@ -605,7 +619,7 @@ endpoints = function (_, MiniStore, preflight) {
    * @param {string} path - Path of endpoint.
    */
   Endpoints.prototype._getResource = function (path) {
-    var resource = this.resources.data[path];
+    var resource = this.resources.get(path);
     if (!resource) {
       throw new ReferenceError('No resource exists at `' + path + '`.');
     }
@@ -666,13 +680,42 @@ endpoints = function (_, MiniStore, preflight) {
     }
   };
   /**
+   * Add any required authorization headers.
+   *
+   * @private
+   *
+   * @param {object} endpoint - Endpoint object
+   * @param {object} processed - Processed options store.
+   */
+  Endpoints.prototype._addAuth = function (endpoint, processed) {
+    if (endpoint.authorization) {
+      var authHeader = this['_auth' + endpoint.authorization]();
+      processed.add('headers:Authorization', authHeader);
+    }
+  };
+  /**
+   * Concat and add args to path if supplied.
+   *
+   * @private
+   *
+   * @param {array} args - args to add to path.
+   * @param {object} processed - Processed options store.
+   */
+  Endpoints.prototype._addArgs = function (args, processed) {
+    if (args) {
+      var additionalPath = '/' + args.join('/');
+      var url = processed.get('url') + additionalPath;
+      processed.add('url', url);
+    }
+  };
+  /**
    * Return HTTP Basic Auth Header.
    *
    * @private
    */
   Endpoints.prototype._authBasic = function () {
-    var id = this.store.data['client_id'];
-    var secret = this.store.data['client_secret'];
+    var id = this.store.get('client_id');
+    var secret = this.store.get('client_secret');
     var encoded = window.btoa(id + ':' + secret);
     return 'Basic ' + encoded;
   };
@@ -682,7 +725,7 @@ endpoints = function (_, MiniStore, preflight) {
    * @private
    */
   Endpoints.prototype._authBearer = function () {
-    var token = this.store.data['access_token'];
+    var token = this.store.get('access_token');
     return 'Bearer ' + token;
   };
   /* -----------------------------------------------------------------------------
