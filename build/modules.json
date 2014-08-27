@@ -6,5 +6,5 @@
   "pre-flight"  : "/node_modules/pre-flight.js/dist/amd",
   "proclaim"    : "/node_modules/proclaim/lib/proclaim",
   "sinon"       : "/node_modules/sinon/pkg/sinon",
-  "stringspace" : "/node_modules/mini-store.js/node_modules/stringspace.js/dist/amd"
+  "stringspace" : "/node_modules/stringspace.js/dist/amd"
 }

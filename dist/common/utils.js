@@ -4,6 +4,8 @@
  * Copyright (c) 2014
  */
 
+var isNull = require('assist/isNull');
+var isUndefined = require('assist/isUndefined');
 var jsonClone = require('assist/jsonClone');
 var snip = require('assist/snip');
 
@@ -14,6 +16,8 @@ var snip = require('assist/snip');
 
 // proxy already built utils
 var _ = {
+  isNull: isNull,
+  isUndefined: isUndefined,
   jsonClone: jsonClone,
   snip: snip
 };
@@ -39,38 +43,6 @@ _.merge = function (dest, obj) {
   }
 
   return dest;
-};
-
-
-/**
- * Return a boolean if a given variable is undefined.
- *
- * @example
- * var isUndefined = _.isUndefined(variable);
- *
- * @public
- *
- * @param {*} variable - value to check if undefined of.
- * @returns {boolean} - result of undefined check.
- */
-_.isUndefined = function (variable) {
-  return typeof variable === 'undefined';
-};
-
-
-/**
- * Return a boolean if a given variable is null.
- *
- * @example
- * var isNull = _.isNull(variable);
- *
- * @public
- *
- * @param {*} variable - value to check if null of.
- * @returns {boolean} - result of null check.
- */
-_.isNull = function (variable) {
-  return variable === null;
 };
 
 

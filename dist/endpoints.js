@@ -15,11 +15,27 @@
 }(this, function () {
 
 /*!
+ * isNull.js
+ * 
+ * Copyright (c) 2014
+ */
+var assistIsNull, assistIsUndefined, assistJsonClone, assistSnip, utils, assistIsObject, assistIsArray, assistDeepMerge, stringspaceUtils, stringspaceStringspace, miniStoreUtils, miniStoreMiniStore, preFlightPreFlight, endpoints;
+assistIsNull = function (variable) {
+  return variable === null;
+};
+/*!
+ * isUndefined.js
+ * 
+ * Copyright (c) 2014
+ */
+assistIsUndefined = function (variable) {
+  return typeof variable === 'undefined';
+};
+/*!
  * jsonClone.js
  * 
  * Copyright (c) 2014
  */
-var assistJsonClone, assistSnip, utils, assistIsObject, assistIsArray, assistDeepMerge, stringspaceUtils, stringspaceStringspace, miniStoreUtils, miniStoreMiniStore, preFlightPreFlight, endpoints;
 assistJsonClone = function (obj) {
   return JSON.parse(JSON.stringify(obj));
 };
@@ -38,15 +54,17 @@ assistSnip = function (obj, prop) {
  * 
  * Copyright (c) 2014
  */
-utils = function (jsonClone, snip) {
+utils = function (isNull, isUndefined, jsonClone, snip) {
   /* -----------------------------------------------------------------------------
    * utils
    * ---------------------------------------------------------------------------*/
   // proxy already built utils
   var _ = {
-      jsonClone: jsonClone,
-      snip: snip
-    };
+    isNull: isNull,
+    isUndefined: isUndefined,
+    jsonClone: jsonClone,
+    snip: snip
+  };
   /**
    * Shallow merge properties from object to
    * another object.
@@ -67,39 +85,11 @@ utils = function (jsonClone, snip) {
     }
     return dest;
   };
-  /**
-   * Return a boolean if a given variable is undefined.
-   *
-   * @example
-   * var isUndefined = _.isUndefined(variable);
-   *
-   * @public
-   *
-   * @param {*} variable - value to check if undefined of.
-   * @returns {boolean} - result of undefined check.
-   */
-  _.isUndefined = function (variable) {
-    return typeof variable === 'undefined';
-  };
-  /**
-   * Return a boolean if a given variable is null.
-   *
-   * @example
-   * var isNull = _.isNull(variable);
-   *
-   * @public
-   *
-   * @param {*} variable - value to check if null of.
-   * @returns {boolean} - result of null check.
-   */
-  _.isNull = function (variable) {
-    return variable === null;
-  };
   /* -----------------------------------------------------------------------------
    * export
    * ---------------------------------------------------------------------------*/
   return _;
-}(assistJsonClone, assistSnip);
+}(assistIsNull, assistIsUndefined, assistJsonClone, assistSnip);
 /*!
  * isObject.js
  * 
@@ -319,9 +309,9 @@ miniStoreUtils = function (isObject, jsonClone, Stringspace) {
    * utils
    * ---------------------------------------------------------------------------*/
   var _ = {
-      isObject: isObject,
-      jsonClone: jsonClone
-    };
+    isObject: isObject,
+    jsonClone: jsonClone
+  };
   /**
    * Loop over object keys and set on obj.
    *
