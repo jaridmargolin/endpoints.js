@@ -23,8 +23,7 @@ var options = {
   'dataType': 'json',
   'timeout': 5000,
   'client_id': 'id',
-  'client_secret': 'secret',
-  'resources': resources
+  'client_secret': 'secret'
 };
 
 /* -----------------------------------------------------------------------------
@@ -34,7 +33,8 @@ var options = {
 describe('endpoints.js', function () {
 
   beforeEach(function () {
-    this.endpoints = new Endpoints($.ajax, options);
+    this.endpoints = new Endpoints($.ajax, resources);
+    this.endpoints.configure(options);
   });
 
 
@@ -47,6 +47,20 @@ describe('endpoints.js', function () {
     it('Should set ajax on instance.', function () {
       assert.equal(this.endpoints.ajax, $.ajax);
     });
+
+    it('Should create and set new MiniStore `resources` on instance.', function () {
+      assert.isInstanceOf(this.endpoints.store, MiniStore);
+      assert.deepEqual(this.endpoints.resources.data, resources);
+    });
+
+  });
+
+
+  /* ---------------------------------------------------------------------------
+   * configure
+   * -------------------------------------------------------------------------*/
+
+  describe('configure', function () {
 
     it('Should create and set new MiniStore `store` on instance.', function () {
       assert.isInstanceOf(this.endpoints.store, MiniStore);
@@ -63,11 +77,6 @@ describe('endpoints.js', function () {
         'dataType': 'json',
         'timeout': 5000,
       });
-    });
-
-    it('Should create and set new MiniStore `resources` on instance.', function () {
-      assert.isInstanceOf(this.endpoints.store, MiniStore);
-      assert.deepEqual(this.endpoints.resources.data, resources);
     });
 
   });
