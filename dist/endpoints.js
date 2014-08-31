@@ -523,24 +523,38 @@ endpoints = function (_, MiniStore, preflight) {
    * @param {object} options - options containg defaults, credentials
    *   and resources.
    */
-  var Endpoints = function (ajax, options) {
-    // Avoid modifying original
-    options = _.jsonClone(options);
+  var Endpoints = function (ajax, resources) {
     // allow ajax calls to be made directly through
     // the library.
     this.ajax = ajax;
     // grab resources. Need to pass at least on resource
     // or the library is useless
-    this.resources = new MiniStore(_.snip(options, 'resources'));
+    this.resources = new MiniStore(resources);
+  };
+  /**
+   * Add store and defaults to instance. Will automatically parse
+   * out client_id and client_secret.
+   *
+   * @example
+   * api.configure(settings);
+   *
+   * @public
+   *
+   * @param {object} settings - Object containing defaults and client
+   *   credentials.
+   */
+  Endpoints.prototype.configure = function (settings) {
+    // Avoid modifying original
+    settings = _.jsonClone(settings);
     // store credentials. The id and secret are added
     // at initiliaztion so that they will remain even
     // after a rest.
     this.store = new MiniStore({
-      'client_id': _.snip(options, 'client_id'),
-      'client_secret': _.snip(options, 'client_secret')
+      'client_id': _.snip(settings, 'client_id'),
+      'client_secret': _.snip(settings, 'client_secret')
     });
     // default parameters added to every call
-    this.defaults = new MiniStore(options);
+    this.defaults = new MiniStore(settings);
   };
   /**
    * Return processed options.
