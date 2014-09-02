@@ -520,16 +520,15 @@ endpoints = function (_, MiniStore, preflight) {
    * @constructor
    *
    * @param {object} ajax - $.ajax or ajax method with identical api.
-   * @param {object} options - options containg defaults, credentials
-   *   and resources.
+   * @param {object} root - root resource.
    */
-  var Endpoints = function (ajax, resources) {
+  var Endpoints = function (ajax, root) {
     // allow ajax calls to be made directly through
     // the library.
     this.ajax = ajax;
     // grab resources. Need to pass at least on resource
     // or the library is useless
-    this.resources = new MiniStore(resources);
+    this.root = root;
   };
   /**
    * Add store and defaults to instance. Will automatically parse
@@ -551,7 +550,8 @@ endpoints = function (_, MiniStore, preflight) {
     // after a rest.
     this.store = new MiniStore({
       'client_id': _.snip(settings, 'client_id'),
-      'client_secret': _.snip(settings, 'client_secret')
+      'client_secret': _.snip(settings, 'client_secret'),
+      'resources': this.root
     });
     // default parameters added to every call
     this.defaults = new MiniStore(settings);
@@ -633,7 +633,7 @@ endpoints = function (_, MiniStore, preflight) {
    * @param {string} path - Path of endpoint.
    */
   Endpoints.prototype._getResource = function (path) {
-    var resource = this.resources.get(path);
+    var resource = this.store.get('resources:' + path);
     if (!resource) {
       throw new ReferenceError('No resource exists at `' + path + '`.');
     }

@@ -23,17 +23,16 @@ var preflight = require('pre-flight/pre-flight');
  * @constructor
  *
  * @param {object} ajax - $.ajax or ajax method with identical api.
- * @param {object} options - options containg defaults, credentials
- *   and resources.
+ * @param {object} root - root resource.
  */
-var Endpoints = function (ajax, resources) {
+var Endpoints = function (ajax, root) {
   // allow ajax calls to be made directly through
   // the library.
   this.ajax = ajax;
 
   // grab resources. Need to pass at least on resource
   // or the library is useless
-  this.resources = new MiniStore(resources);
+  this.root = root;
 };
 
 
@@ -58,7 +57,8 @@ Endpoints.prototype.configure = function (settings) {
   // after a rest.
   this.store = new MiniStore({
     'client_id'     : _.snip(settings, 'client_id'),
-    'client_secret' : _.snip(settings, 'client_secret')
+    'client_secret' : _.snip(settings, 'client_secret'),
+    'resources'     : this.root
   });
 
   // default parameters added to every call
@@ -157,7 +157,7 @@ Endpoints.prototype._options = function (type, path, options) {
  * @param {string} path - Path of endpoint.
  */
 Endpoints.prototype._getResource = function(path) {
-  var resource = this.resources.get(path);
+  var resource = this.store.get('resources:' + path);
   if (!resource) {
     throw new ReferenceError('No resource exists at `' + path + '`.');
   }
