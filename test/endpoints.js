@@ -48,9 +48,9 @@ describe('endpoints.js', function () {
       assert.equal(this.endpoints.ajax, $.ajax);
     });
 
-    it('Should create and set new MiniStore `resources` on instance.', function () {
+    it('Should create store root resource on object.', function () {
       assert.isInstanceOf(this.endpoints.store, MiniStore);
-      assert.deepEqual(this.endpoints.resources.data, resources);
+      assert.deepEqual(this.endpoints.root, resources);
     });
 
   });
@@ -66,7 +66,8 @@ describe('endpoints.js', function () {
       assert.isInstanceOf(this.endpoints.store, MiniStore);
       assert.deepEqual(this.endpoints.store.data, {
         'client_id': 'id',
-        'client_secret': 'secret'
+        'client_secret': 'secret',
+        'resources': resources
       });
     });
 
