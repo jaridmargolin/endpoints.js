@@ -5,8 +5,8 @@
  */
 
 define([
-  'assist/isNull',
-  'assist/isUndefined',
+  'utl/isNull',
+  'utl/isUndefined',
   'assist/jsonClone',
   'assist/snip'
 ], function (isNull, isUndefined, jsonClone, snip) {

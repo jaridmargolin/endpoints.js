@@ -16,13 +16,15 @@
   },
   "main": "dist/common/endpoints.js",
   "dependencies": {
-    "assist.js": "~0.3.0",
-    "mini-store.js": "~0.3.0",
+    "assist.js": "~0.4.0",
+    "utl-companion.js": "~0.0.1",
+    "utl.js": "~0.1.0",
+    "mini-store.js": "~0.4.0",
     "pre-flight.js": "~0.0.2",
-    "stringspace.js": "~0.2.2"
+    "stringspace.js": "~0.3.0"
   },
   "devDependencies": {
-    "easy-build": "~0.0.3",
+    "easy-build": "~0.1.0",
     "jquery": "~1.11.1",
     "proclaim": "~2.0.0",
     "sinon": "~1.10.1"
