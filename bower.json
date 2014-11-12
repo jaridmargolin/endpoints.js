@@ -1,6 +1,6 @@
 {
   "name": "endpoints.js",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "dependencies": {
     "assist.js": "~0.4.0",
     "utl-companion.js": "~0.0.1",
