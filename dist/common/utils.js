@@ -4,8 +4,8 @@
  * Copyright (c) 2014
  */
 
-var isNull = require('assist/isNull');
-var isUndefined = require('assist/isUndefined');
+var isNull = require('utl/isNull');
+var isUndefined = require('utl/isUndefined');
 var jsonClone = require('assist/jsonClone');
 var snip = require('assist/snip');
 

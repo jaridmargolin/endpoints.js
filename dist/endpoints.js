@@ -19,8 +19,8 @@
  * 
  * Copyright (c) 2014
  */
-var assistIsNull, assistIsUndefined, assistJsonClone, assistSnip, utils, assistIsObject, assistIsArray, assistDeepMerge, stringspaceUtils, stringspaceStringspace, miniStoreUtils, miniStoreMiniStore, preFlightPreFlight, endpoints;
-assistIsNull = function (variable) {
+var utlIsNull, utlIsUndefined, assistJsonClone, assistSnip, utils, utlIsObject, utlIsArray, utlCompanionDeepMerge, stringspaceUtils, stringspaceStringspace, miniStoreUtils, miniStoreMiniStore, preFlightPreFlight, endpoints;
+utlIsNull = function (variable) {
   return variable === null;
 };
 /*!
@@ -28,7 +28,7 @@ assistIsNull = function (variable) {
  * 
  * Copyright (c) 2014
  */
-assistIsUndefined = function (variable) {
+utlIsUndefined = function (variable) {
   return typeof variable === 'undefined';
 };
 /*!
@@ -89,13 +89,13 @@ utils = function (isNull, isUndefined, jsonClone, snip) {
    * export
    * ---------------------------------------------------------------------------*/
   return _;
-}(assistIsNull, assistIsUndefined, assistJsonClone, assistSnip);
+}(utlIsNull, utlIsUndefined, assistJsonClone, assistSnip);
 /*!
  * isObject.js
  * 
  * Copyright (c) 2014
  */
-assistIsObject = function (value) {
+utlIsObject = function (value) {
   return value === Object(value);
 };
 /*!
@@ -103,7 +103,7 @@ assistIsObject = function (value) {
  * 
  * Copyright (c) 2014
  */
-assistIsArray = function (value) {
+utlIsArray = function (value) {
   return Object.prototype.toString.call(value) === '[object Array]';
 };
 /*!
@@ -111,7 +111,7 @@ assistIsArray = function (value) {
  * 
  * Copyright (c) 2014
  */
-assistDeepMerge = function (isArray, isObject) {
+utlCompanionDeepMerge = function (isArray, isObject) {
   /* -----------------------------------------------------------------------------
    * deepMerge
    * ---------------------------------------------------------------------------*/
@@ -150,22 +150,21 @@ assistDeepMerge = function (isArray, isObject) {
    * deepMerge
    * ---------------------------------------------------------------------------*/
   return deepMerge;
-}(assistIsArray, assistIsObject);
+}(utlIsArray, utlIsObject);
 /*!
  * utils.js
  * 
  * Copyright (c) 2014
  */
-stringspaceUtils = function (isArray, isObject, deepMerge) {
+stringspaceUtils = function (isObject, deepMerge) {
   /* -----------------------------------------------------------------------------
    * utils
    * ---------------------------------------------------------------------------*/
   return {
     isObject: isObject,
-    isArray: isArray,
     deepMerge: deepMerge
   };
-}(assistIsArray, assistIsObject, assistDeepMerge);
+}(utlIsObject, utlCompanionDeepMerge);
 /*!
  * stringspace.js
  * 
@@ -203,16 +202,7 @@ stringspaceStringspace = function (_) {
    *   the object.
    */
   Stringspace.prototype.get = function (obj, key) {
-    var val;
-    this._loop(obj, key, {
-      last: function (obj, parts, i) {
-        val = obj[parts[i]];
-      },
-      missing: function (obj, parts, i) {
-        return false;
-      }
-    });
-    return val;
+    return this._get(obj, key).val;
   };
   /**
    * Set an object prop by string stringspace.
@@ -229,17 +219,14 @@ stringspaceStringspace = function (_) {
    * @param {boolean} deep - Indicated if conflicts should be reserved
    *   with a deep merge or an overwrite.
    */
-  Stringspace.prototype.set = function (obj, key, val, deep) {
-    this._loop(obj, key, {
-      last: function (obj, parts, i) {
-        var curVal = obj[parts[i]];
-        return typeof curVal !== 'object' || !deep ? obj[parts[i]] = val : obj[parts[i]] = _.deepMerge(curVal, val);
-      },
-      missing: function (obj, parts, i) {
-        obj[parts[i]] = {};
-      }
-    });
-    return val;
+  Stringspace.prototype.set = function (obj, keyStr, val, deep) {
+    var result = this._get(obj, keyStr, true);
+    var curVal = result.val;
+    var parent = result.parent;
+    var key = result.key;
+    var shouldMerge = _.isObject(curVal) && deep;
+    parent[key] = shouldMerge ? _.deepMerge(curVal, val) : val;
+    return parent[key];
   };
   /**
    * Remove value from obj
@@ -250,17 +237,13 @@ stringspaceStringspace = function (_) {
    * @public
    *
    * @param {object} obj - The object to remove value from.
-   * @param {string} key - String representing the key to remove.
+   * @param {string} keyStr - String representing the key to remove.
    */
-  Stringspace.prototype.remove = function (obj, key) {
-    var lastSpacer = key.lastIndexOf(':');
-    var itemKey = key;
-    var parent = obj;
-    if (lastSpacer > 0) {
-      parent = this.get(obj, key.slice(0, lastSpacer));
-      itemKey = key.slice(lastSpacer + 1);
-    }
-    delete parent[itemKey];
+  Stringspace.prototype.remove = function (obj, keyStr) {
+    var result = this._get(obj, keyStr);
+    var parent = result.parent;
+    var key = result.key;
+    delete parent[key];
   };
   /**
    * Helper method to recursively loop through object.
@@ -268,26 +251,26 @@ stringspaceStringspace = function (_) {
    * @private
    *
    * @param {object} obj - The object to act on.
-   * @param {string} key - Formatted string representing a key in
+   * @param {string} keyStr - Formatted string representing a key in
    *   the object.
-   * @param {object} opts - Object containing methods on how to handle
-   *   various situations encountered during loop.
+   * @param {object} create - Flag for if we should create an empty object
+   *   when an undefined property is found.
    */
-  Stringspace.prototype._loop = function (obj, key, opts) {
-    var parts = key.split(this.seperator);
+  Stringspace.prototype._get = function (obj, keyStr, create) {
+    var parts = keyStr.split(this.seperator);
     for (var i = 0, len = parts.length; i < len; i++) {
-      // If last stringspace - set value
-      if (len === i + 1) {
-        opts.last(obj, parts, i);
-        return;
+      var key = parts[i];
+      var val = obj[key];
+      var isLast = len === i + 1;
+      var isUndf = !val && !create;
+      if (isLast || isUndf) {
+        return {
+          key: key,
+          val: val,
+          parent: obj
+        };
       }
-      // If no stringspace - create & set obj to current
-      if (!obj[parts[i]]) {
-        if (opts.missing(obj, parts, i) === false) {
-          return undefined;
-        }
-      }
-      obj = obj[parts[i]];
+      obj = obj[key] = val || {};
     }
   };
   /* -----------------------------------------------------------------------------
@@ -383,7 +366,7 @@ miniStoreUtils = function (isObject, jsonClone, Stringspace) {
    * export
    * ---------------------------------------------------------------------------*/
   return _;
-}(assistIsObject, assistJsonClone, stringspaceStringspace);
+}(utlIsObject, assistJsonClone, stringspaceStringspace);
 /*!
  * mini-store.js
  * 
