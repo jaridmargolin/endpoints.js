@@ -33,7 +33,7 @@ var options = {
 
 describe('endpoints.js', function () {
 
-  beforeEach(function () {
+  beforeEach(function () {    
     this.endpoints = new Endpoints($.ajax, options);
   });
 
@@ -60,6 +60,17 @@ describe('endpoints.js', function () {
         'client_secret': 'secret'
       });
       assert.deepEqual(this.endpoints.store.data.resources, resources);
+    });
+
+    it('Should call intialize if exists.', function () {
+      Endpoints.prototype.intialize = function (settings) {
+        this.initialized = true;
+      };
+
+      var endpoints = new Endpoints($.ajax, options);
+      assert.isTrue(endpoints.initialized);
+
+      delete Endpoints.prototype['intialize'];
     });
 
   });

@@ -31,6 +31,11 @@ var Endpoints = function (ajax, settings) {
   // allow ajax calls to be made directly through the library.
   this.ajax = ajax;
   this.store = new MiniStore(settings);
+
+  // useful for subclasses to add aditional functionality once instantiated.
+  if (this.intialize) {
+    this.intialize(settings);
+  }
 };
 
 
