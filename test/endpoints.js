@@ -19,11 +19,12 @@ define([
  * ---------------------------------------------------------------------------*/
 
 var options = {
-  'url': 'http://endpoints.com',
-  'dataType': 'json',
-  'timeout': 5000,
-  'client_id': 'id',
-  'client_secret': 'secret'
+  'defaults:url': 'http://endpoints.com',
+  'defaults:dataType': 'json',
+  'defaults:timeout': 5000,
+  'credentials:client_id': 'id',
+  'credentials:client_secret': 'secret',
+  'resources': resources
 };
 
 /* -----------------------------------------------------------------------------
@@ -33,8 +34,7 @@ var options = {
 describe('endpoints.js', function () {
 
   beforeEach(function () {
-    this.endpoints = new Endpoints($.ajax, resources);
-    this.endpoints.configure(options);
+    this.endpoints = new Endpoints($.ajax, options);
   });
 
 
@@ -48,36 +48,18 @@ describe('endpoints.js', function () {
       assert.equal(this.endpoints.ajax, $.ajax);
     });
 
-    it('Should create store root resource on object.', function () {
-      assert.isInstanceOf(this.endpoints.store, MiniStore);
-      assert.deepEqual(this.endpoints.root, resources);
-    });
-
-  });
-
-
-  /* ---------------------------------------------------------------------------
-   * configure
-   * -------------------------------------------------------------------------*/
-
-  describe('configure', function () {
-
     it('Should create and set new MiniStore `store` on instance.', function () {
       assert.isInstanceOf(this.endpoints.store, MiniStore);
-      assert.deepEqual(this.endpoints.store.data, {
-        'client_id': 'id',
-        'client_secret': 'secret',
-        'resources': resources
-      });
-    });
-
-    it('Should create and set new MiniStore `defaults` on instance.', function () {
-      assert.isInstanceOf(this.endpoints.store, MiniStore);
-      assert.deepEqual(this.endpoints.defaults.data, {
+      assert.deepEqual(this.endpoints.store.data.defaults, {
         'url': 'http://endpoints.com',
         'dataType': 'json',
-        'timeout': 5000,
+        'timeout': 5000
       });
+      assert.deepEqual(this.endpoints.store.data.credentials, {
+        'client_id': 'id',
+        'client_secret': 'secret'
+      });
+      assert.deepEqual(this.endpoints.store.data.resources, resources);
     });
 
   });
@@ -214,7 +196,7 @@ describe('endpoints.js', function () {
   describe('_authBasic', function () {
 
     it('Should return value for Basic Authorization header.', function () {
-      var encoded = window.btoa(options['client_id'] + ':' + options['client_secret']);
+      var encoded = window.btoa(options['credentials:client_id'] + ':' + options['credentials:client_secret']);
       var expected = 'Basic ' + encoded;
 
       assert.equal(this.endpoints._authBasic(), expected);
@@ -233,7 +215,7 @@ describe('endpoints.js', function () {
       var token = 'token';
       var expected = 'Bearer ' + token;
 
-      this.endpoints.store.add('access_token', token);
+      this.endpoints.store.add('credentials:access_token', token);
       assert.equal(this.endpoints._authBearer(), expected);
     });
 
@@ -252,7 +234,7 @@ describe('endpoints.js', function () {
       this.requiredSpy = sinon.spy(this.endpoints, '_hasRequired');
       this.validSpy    = sinon.spy(this.endpoints, '_isValid');
 
-      this.endpoints.store.add('access_token', 'token');
+      this.endpoints.store.add('credentials:access_token', 'token');
       this.options = this.endpoints._options('POST', '/endpoint', {
         args: ['foo', 'bar'],
         data: { 'foo': false }

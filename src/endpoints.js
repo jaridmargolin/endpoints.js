@@ -27,44 +27,10 @@ define([
  * @param {object} ajax - $.ajax or ajax method with identical api.
  * @param {object} root - root resource.
  */
-var Endpoints = function (ajax, root) {
-  // allow ajax calls to be made directly through
-  // the library.
+var Endpoints = function (ajax, settings) {
+  // allow ajax calls to be made directly through the library.
   this.ajax = ajax;
-
-  // grab resources. Need to pass at least on resource
-  // or the library is useless
-  this.root = root;
-};
-
-
-/**
- * Add store and defaults to instance. Will automatically parse
- * out client_id and client_secret.
- *
- * @example
- * api.configure(settings);
- *
- * @public
- *
- * @param {object} settings - Object containing defaults and client
- *   credentials.
- */
-Endpoints.prototype.configure = function (settings) {
-  // Avoid modifying original
-  settings = _.jsonClone(settings);
-  
-  // store credentials. The id and secret are added
-  // at initiliaztion so that they will remain even
-  // after a rest.
-  this.store = new MiniStore({
-    'client_id'     : _.snip(settings, 'client_id'),
-    'client_secret' : _.snip(settings, 'client_secret'),
-    'resources'     : this.root
-  });
-
-  // default parameters added to every call
-  this.defaults = new MiniStore(settings);
+  this.store = new MiniStore(settings);
 };
 
 
@@ -132,7 +98,7 @@ Endpoints.prototype._options = function (type, path, options) {
   this._isValid(params, data);
 
   // temp store used for manipulating options
-  var processed = new MiniStore(this.defaults.get());
+  var processed = new MiniStore(this.store.get('defaults'));
 
   // populate processed
   processed.add('url', processed.get('url') + path);
@@ -270,8 +236,8 @@ Endpoints.prototype._addArgs = function (args, processed) {
  * @private
  */
 Endpoints.prototype._authBasic = function () {
-  var id = this.store.get('client_id');
-  var secret = this.store.get('client_secret');
+  var id = this.store.get('credentials:client_id');
+  var secret = this.store.get('credentials:client_secret');
   var encoded = window.btoa(id + ':' + secret);
 
   return 'Basic ' + encoded;
@@ -284,7 +250,7 @@ Endpoints.prototype._authBasic = function () {
  * @private
  */
 Endpoints.prototype._authBearer = function () {
-  var token = this.store.get('access_token');
+  var token = this.store.get('credentials:access_token');
 
   return 'Bearer ' + token;
 };
