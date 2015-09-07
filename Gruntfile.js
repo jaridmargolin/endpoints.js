@@ -1,7 +1,5 @@
 /*!
  * Gruntfile.js
- * 
- * Copyright (c) 2014
  */
 
 // 3rd party

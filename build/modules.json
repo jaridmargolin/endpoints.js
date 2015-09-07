@@ -1,5 +1,7 @@
 {
   "assist"        : "/node_modules/assist.js/dist/amd",
+  "child"         : "/node_modules/child.js/dist/amd",
+  "event-emitter" : "/node_modules/event-emitter.js/dist/amd",
   "fixtures"      : "/test/fixtures",
   "jquery"        : "/node_modules/jquery/dist/jquery",
   "mini-store"    : "/node_modules/mini-store.js/dist/amd",

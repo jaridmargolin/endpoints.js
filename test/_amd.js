@@ -1,13 +1,17 @@
 /*!
  * test/_amd.js
- * 
- * Copyright (c) 2014
  */
 
-define([
-  'proclaim',
-  'endpoints/endpoints'
-], function (assert, Endpoints) {
+define(function (require) {
+
+
+/* -----------------------------------------------------------------------------
+ * dependencies
+ * ---------------------------------------------------------------------------*/
+
+var $ = require('jquery');
+var assert = require('proclaim');
+var Endpoints = require('endpoints/endpoints');
 
 
 /* -----------------------------------------------------------------------------
@@ -17,7 +21,8 @@ define([
 describe('amd - endpoints.js', function () {
 
   it('Should create a new instance.', function () {
-    
+    var endpoints = new Endpoints($.ajax, {});
+    assert.isInstanceOf(endpoints, Endpoints);
   });
 
 });

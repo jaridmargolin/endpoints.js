@@ -1,17 +1,20 @@
 /*!
  * test/endpoints.js
- * 
- * Copyright (c) 2014
  */
 
-define([
-  'jquery',
-  'proclaim',
-  'sinon',
-  'mini-store/mini-store',
-  'fixtures/resources',
-  'endpoints'
-], function ($, assert, sinon, MiniStore, resources, Endpoints) {
+define(function (require) {
+
+
+/* -----------------------------------------------------------------------------
+ * dependencies
+ * ---------------------------------------------------------------------------*/
+
+var $ = require('jquery');
+var assert = require('proclaim');
+var sinon = require('sinon');
+var MiniStore = require('mini-store/mini-store');
+var resources = require('fixtures/resources');
+var Endpoints = require('endpoints');
 
 
 /* -----------------------------------------------------------------------------
@@ -49,17 +52,17 @@ describe('endpoints.js', function () {
     });
 
     it('Should create and set new MiniStore `store` on instance.', function () {
-      assert.isInstanceOf(this.endpoints.store, MiniStore);
-      assert.deepEqual(this.endpoints.store.data.defaults, {
+      assert.isInstanceOf(this.endpoints, MiniStore);
+      assert.deepEqual(this.endpoints.attributes.defaults, {
         'url': 'http://endpoints.com',
         'dataType': 'json',
         'timeout': 5000
       });
-      assert.deepEqual(this.endpoints.store.data.credentials, {
+      assert.deepEqual(this.endpoints.attributes.credentials, {
         'client_id': 'id',
         'client_secret': 'secret'
       });
-      assert.deepEqual(this.endpoints.store.data.resources, resources);
+      assert.deepEqual(this.endpoints.attributes.resources, resources);
     });
 
     it('Should call intialize if exists.', function () {
@@ -226,7 +229,7 @@ describe('endpoints.js', function () {
       var token = 'token';
       var expected = 'Bearer ' + token;
 
-      this.endpoints.store.add('credentials:access_token', token);
+      this.endpoints.set('credentials:access_token', token);
       assert.equal(this.endpoints._authBearer(), expected);
     });
 
@@ -245,7 +248,7 @@ describe('endpoints.js', function () {
       this.requiredSpy = sinon.spy(this.endpoints, '_hasRequired');
       this.validSpy    = sinon.spy(this.endpoints, '_isValid');
 
-      this.endpoints.store.add('credentials:access_token', 'token');
+      this.endpoints.set('credentials:access_token', 'token');
       this.options = this.endpoints._options('POST', '/endpoint', {
         args: ['foo', 'bar'],
         data: { 'foo': false }
