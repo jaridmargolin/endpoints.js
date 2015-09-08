@@ -66,7 +66,7 @@ describe('endpoints.js', function () {
     });
 
     it('Should call intialize if exists.', function () {
-      Endpoints.prototype.intialize = function (settings) {
+      Endpoints.prototype.initialize = function (settings) {
         this.initialized = true;
       };
 

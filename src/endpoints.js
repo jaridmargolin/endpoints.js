@@ -44,8 +44,8 @@ return child(MiniStore, {
     MiniStore.prototype.constructor.call(this, settings);
 
     // useful for subclasses to add aditional functionality once instantiated.
-    if (this.intialize) {
-      this.intialize(settings);
+    if (this.initialize) {
+      this.initialize(settings);
     }
   },
 
