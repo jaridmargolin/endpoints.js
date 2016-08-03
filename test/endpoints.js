@@ -183,13 +183,15 @@ describe('endpoints.js', function () {
       this.params = endpoint['params'];
     });
 
-    it('Should throw error if unknown key is passed.', function () {
+    it('Should log warning if unknown key is passed.', function () {
       var self = this;
       var expected = 'The endpoint does not accept the key: `baz`.';
+      var warningSpy = sinon.spy(console, 'warn');
 
-      assert.throws(function () {
-        self.endpoints._isValid(self.params, { 'baz': true });
-      });
+      self.endpoints._isValid(self.params, { 'baz': true });
+      assert.isTrue(warningSpy.calledOnce);
+
+      warningSpy.restore();
     });
 
     it('Should not throw Error if all keys are known.', function () {

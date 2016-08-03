@@ -197,8 +197,8 @@ return child(MiniStore, {
    */
   _isValid: function(params, data) {
     for (var j in data) {
-      if (isUndefined(params[j])) {
-        throw new Error('The endpoint does not accept the key: `' + j + '`');
+      if (isUndefined(params[j]) && console) {
+        console.warn('The endpoint does not accept the key: `' + j + '`');
       }
     }
   },
