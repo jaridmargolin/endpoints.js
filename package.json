@@ -19,17 +19,18 @@
     "assist.js": "~0.4.2",
     "child.js": "~0.2.1",
     "event-emitter.js": "~0.2.2",
-    "mini-store.js": "~1.0.0",
+    "mini-store.js": "~2.0.0",
     "pre-flight.js": "~0.0.2",
     "stringspace.js": "~0.3.0",
     "utl-companion.js": "~0.0.1",
     "utl.js": "~0.1.1"
   },
   "devDependencies": {
-    "easy-build": "~0.1.0",
+    "easy-build": "~1.0.0",
+    "grunt": "~1.0.1",
     "jquery": "~1.11.1",
-    "proclaim": "~3.3.1",
-    "sinon": "~1.16.1"
+    "proclaim": "~3.4.1",
+    "sinon": "~1.17.5"
   },
   "license": "MIT"
 }
