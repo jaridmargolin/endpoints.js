@@ -2,7 +2,7 @@
   "name": "endpoints.js",
   "description": "JSON configured API interface.",
   "author": "Jarid Margolin <jarid@firstopinion.co>",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "homepage": "https://github.com/firstopinion/endpoints.js",
   "repository": {
     "type": "git",
