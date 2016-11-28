@@ -137,7 +137,12 @@ return child(MiniStore, {
    * @param {string} path - Path of endpoint.
    */
   _getResource: function(path) {
-    var resource = this.get('resources:' + path);
+    var resource;
+    while(!resource && path.indexOf('/') !== -1) {
+      resource = this.get('resources:' + path);
+      path = path.substring(0, path.lastIndexOf('/'));
+    }
+
     if (!resource) {
       throw new ReferenceError('No resource exists at `' + path + '`.');
     }

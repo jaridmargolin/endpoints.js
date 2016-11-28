@@ -92,6 +92,12 @@ describe('endpoints.js', function () {
       assert.deepEqual(resource, expected);
     });
 
+    it('Should crawl endpoint segments to find resource.', function () {
+      var expected = resources['/endpoint'];
+
+      var resource = this.endpoints._getResource('/endpoint/test');
+      assert.deepEqual(resource, expected);
+    });
 
     it('Should throw ReferenceError if resource does not exist.', function () {
       var self = this;
